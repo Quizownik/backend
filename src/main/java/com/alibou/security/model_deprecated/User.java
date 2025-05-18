@@ -1,4 +1,4 @@
-//package com.alibou.security.model_deprecated;
+package com.alibou.security.model_deprecated;//package com.alibou.security.model_deprecated;
 //
 //import jakarta.persistence.*;
 //import lombok.AllArgsConstructor;

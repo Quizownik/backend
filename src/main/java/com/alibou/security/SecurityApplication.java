@@ -1,8 +1,11 @@
 package com.alibou.security;
 
+import com.alibou.security.answer.Answer;
+import com.alibou.security.answer.AnswerRepository;
 import com.alibou.security.auth.AuthenticationService;
 import com.alibou.security.auth.RegisterRequest;
 import com.alibou.security.user.Role;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,8 +25,8 @@ public class SecurityApplication {
 
 	@Bean
 	public CommandLineRunner commandLineRunner(
-			AuthenticationService service
-	) {
+			AuthenticationService service,
+			AnswerRepository answerRepository) {
 		return args -> {
 			var admin = RegisterRequest.builder()
 					.firstname("Admin")
@@ -42,7 +45,8 @@ public class SecurityApplication {
 					.role(MANAGER)
 					.build();
 			System.out.println("Manager token: " + service.register(manager).getAccessToken());
-
+			Answer test_ans = new Answer("To jest poprawna odpowiedz", true, null,1,1);
+			answerRepository.save(test_ans);
 		};
 	}
 }

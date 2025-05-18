@@ -1,9 +1,5 @@
 package com.alibou.security.answer;
 
-import com.alibou.security.answer.Answer;
-import com.alibou.security.answer.AnswerRepository;
-import com.alibou.security.answer.AnswerRequest;
-import com.alibou.security.book.Book;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package com.alibou.security.answer;
 
-//import com.alibou.security.model_deprecated.Question;
+import com.alibou.security.question.Question;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,17 +30,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "Answer")
 public class Answer {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Integer id;
 
     private String answer;
 
     private boolean isCorrect;
 
-//    @ManyToOne
-//    @JoinColumn(name = "question_id")
-//    private Question question;
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    private Question question;
 
     @CreatedBy
     @Column(
@@ -52,4 +53,18 @@ public class Answer {
     @LastModifiedBy
     @Column(insertable = false)
     private Integer lastModifiedBy;
+
+    public Answer(String answer, boolean isCorrect, Question question, Integer createdBy, Integer lastModifiedBy) {
+        this.answer = answer;
+        this.isCorrect = isCorrect;
+        this.question = question;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Answer(String answer, boolean isCorrect, Question question) {
+        this.answer = answer;
+        this.isCorrect = isCorrect;
+        this.question = question;
+    }
 }
