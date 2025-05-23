@@ -12,11 +12,12 @@ public class AnswerService {
     private final AnswerRepository repository;
 
     public void save(AnswerRequest request) {
+
         var answer = Answer.builder()
-                .answer(request.getAnswer())
+                .answer(request.answer())
                 .isCorrect(request.isCorrect())
-                //.question(request.que jak to polaczyc?
                 .build();
+
         repository.save(answer);
     }
 

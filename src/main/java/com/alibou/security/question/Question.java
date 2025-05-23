@@ -1,6 +1,7 @@
 package com.alibou.security.question;
 
 import com.alibou.security.answer.Answer;
+import com.alibou.security.quiz.Category;
 import com.alibou.security.quiz.Quiz;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -30,7 +31,9 @@ public class Question {
 
     private String question;
 
-    @OneToMany(mappedBy = "question")
+    private Category category;
+
+    @OneToMany(mappedBy = "question",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers;
 
 

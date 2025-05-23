@@ -1,18 +1,13 @@
 package com.alibou.security.question;
 
-import com.alibou.security.answer.Answer;
 import com.alibou.security.answer.AnswerRequest;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.alibou.security.quiz.Category;
 
 import java.util.List;
-@Getter
-@Setter
-@Builder
-public class QuestionRequest {
-    private Integer id;
-    private String question;
-    private List<AnswerRequest> answers;
 
+public record QuestionRequest(
+       // Integer id,
+        String question,
+        Category category,
+        List<AnswerRequest>answers) {
 }

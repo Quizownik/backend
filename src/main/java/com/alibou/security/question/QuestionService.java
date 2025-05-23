@@ -2,92 +2,103 @@ package com.alibou.security.question;
 
 import com.alibou.security.answer.Answer;
 import com.alibou.security.answer.AnswerRepository;
-import com.alibou.security.answer.AnswerRequest;
 import com.alibou.security.answer.AnswerResponse;
+import com.alibou.security.quiz.Category;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class QuestionService {
 
-    private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
-
-    // Używane w POST (tworzenie pytania)
-    public void save(QuestionRequest request) {
-        // Pobierz ID aktualnie zalogowanego użytkownika
+    private final QuestionRepository questionRepository;
+    public QuestionResponse create(QuestionRequest request) {
         Integer currentUserId = getCurrentUserId();
 
         Question question = Question.builder()
-                .question(request.getQuestion())
+                .question(request.question())
+                .category(request.category())
                 .createdBy(currentUserId)
                 .build();
 
-        Question savedQuestion = questionRepository.save(question);
+        Question saved = questionRepository.save(question);
 
-        List<Answer> answers = request.getAnswers().stream()
-                .map(answerReq -> Answer.builder()
-                        .answer(answerReq.getAnswer())
-                        .isCorrect(answerReq.isCorrect())
-                        .question(savedQuestion)
+        List<Answer> answers = request.answers().stream()
+                .map(a -> Answer.builder()
+                        .answer(a.answer())
+                        .isCorrect(a.isCorrect())
+                        .question(saved)
                         .build())
                 .toList();
 
         answerRepository.saveAll(answers);
-        savedQuestion.setAnswers(answers);
+        saved.setAnswers(answers);
+
+        return toResponse(saved);
     }
 
+    public QuestionResponse update(Integer id, QuestionRequest request) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
 
-    // Używane w GET (pojedynczy obiekt)
-    public Optional<QuestionResponse> findById(Integer id) {
-        return questionRepository.findById(id)
-                .map(this::toResponseDto);
-    }
+        question.setQuestion(request.question());
+        question.setCategory(request.category());
 
-    // Używane w GET (wszystkie pytania)
-    public List<QuestionResponse> findAll() {
-        return questionRepository.findAll()
-                .stream()
-                .map(this::toResponseDto)
+        questionRepository.save(question);
+
+        // Usuń stare odpowiedzi i zapisz nowe
+        answerRepository.deleteById(id);
+        List<Answer> newAnswers = request.answers().stream()
+                .map(a -> Answer.builder()
+                        .answer(a.answer())
+                        .isCorrect(a.isCorrect())
+                        .question(question)
+                        .build())
                 .toList();
+        answerRepository.saveAll(newAnswers);
+        question.setAnswers(newAnswers);
+
+        return toResponse(question);
     }
 
-    // Mapowanie do DTO używanego przy GET
-    public QuestionResponse toResponseDto(Question question) {
-        return QuestionResponse.builder()
-                .id(question.getId())
-                .question(question.getQuestion())
-                .answers(
-                        question.getAnswers().stream()
-                                .map(answer -> AnswerResponse.builder()
-                                        .id(answer.getId())
-                                        .answer(answer.getAnswer())
-                                        .isCorrect(answer.isCorrect())
-                                        .build())
-                                .toList()
-                )
-                .build();
+    public void delete(Integer id) {
+        //answerRepository.deleteById(id);
+        questionRepository.deleteById(id);
     }
 
-    // (opcjonalnie) mapowanie do użycia przy edycji
-    public QuestionRequest toRequestDto(Question question) {
-        return QuestionRequest.builder()
-                .id(question.getId())
-                .question(question.getQuestion())
-                .answers(
-                        question.getAnswers().stream()
-                                .map(answer -> AnswerRequest.builder()
-                                        .answer(answer.getAnswer())
-                                        .isCorrect(answer.isCorrect())
-                                        .build())
-                                .toList()
-                )
-                .build();
+    private QuestionResponse toResponse(Question question) {
+        List<AnswerResponse> answers = question.getAnswers().stream()
+                .map(a -> new AnswerResponse(a.getId(), a.getAnswer(), a.isCorrect()))
+                .toList();
+
+        return new QuestionResponse(
+                question.getId(),
+                question.getQuestion(),
+                question.getCategory(),
+                answers
+        );
     }
+
+
+    public Page<QuestionResponse> findAllByCategory(Category category, Pageable pageable) {
+        Page<Question> page = questionRepository.findByCategory(category, pageable);
+        return page.map(this::toResponse);
+    }
+
+    public Page<QuestionResponse> findAll( Pageable pageable) {
+        Page<Question> page = questionRepository.findAll(pageable);
+        return page.map(this::toResponse);
+    }
+
 
     private Integer getCurrentUserId() {
         var authentication = org.springframework.security.core.context.SecurityContextHolder
