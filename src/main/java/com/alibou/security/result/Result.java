@@ -39,6 +39,9 @@ public class Result {
     private LocalDateTime finishedAt;
 
     private Duration duration;
+    //list <kolejnosc pytan>
+    //list <id_question_kotre zaznaczyles>
+    //list <id poprawna odpowiedz>
 
     @OneToMany
     private List<Question> correctQuestions;

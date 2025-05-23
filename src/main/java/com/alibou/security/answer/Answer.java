@@ -51,7 +51,7 @@ public class Answer {
     private Integer createdBy;
 
     @LastModifiedBy
-    @Column(insertable = false)
+    @Column(nullable = false)
     private Integer lastModifiedBy;
 
     public Answer(String answer, boolean isCorrect, Question question, Integer createdBy, Integer lastModifiedBy) {

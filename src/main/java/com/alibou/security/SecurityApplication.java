@@ -21,12 +21,13 @@ public class SecurityApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SecurityApplication.class, args);
+		System.out.println("Admin token : eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTc0NzY2MTU0MSwiZXhwIjoxNzQ3NzQ3OTQxfQ.HqB3_uTVH18RbjLtFIqf3TVxcmE54XQCz7D-n-LADkw");
 	}
 
 	@Bean
 	public CommandLineRunner commandLineRunner(
-			AuthenticationService service,
-			AnswerRepository answerRepository) {
+			AuthenticationService service
+	) {
 		return args -> {
 			var admin = RegisterRequest.builder()
 					.firstname("Admin")
@@ -45,8 +46,7 @@ public class SecurityApplication {
 					.role(MANAGER)
 					.build();
 			System.out.println("Manager token: " + service.register(manager).getAccessToken());
-			Answer test_ans = new Answer("To jest poprawna odpowiedz", true, null,1,1);
-			answerRepository.save(test_ans);
+
 		};
 	}
 }

@@ -7,7 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class AnswerRequest {
+public class AnswerResponse {
+    private Integer id;
     private String answer;
     private boolean isCorrect;
 

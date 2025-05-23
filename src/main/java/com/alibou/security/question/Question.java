@@ -2,6 +2,7 @@ package com.alibou.security.question;
 
 import com.alibou.security.answer.Answer;
 import com.alibou.security.quiz.Quiz;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -32,7 +33,9 @@ public class Question {
     @OneToMany(mappedBy = "question")
     private List<Answer> answers;
 
-    @ManyToMany
+
+    @JsonBackReference
+    @ManyToMany(mappedBy = "questions")
     private List<Quiz> quizes;
 
     @CreatedBy
@@ -43,7 +46,7 @@ public class Question {
     private Integer createdBy;
 
     @LastModifiedBy
-    @Column(insertable = false)
+    @Column(nullable = false)
     private Integer lastModifiedBy;
 
     @CreatedDate
@@ -54,6 +57,6 @@ public class Question {
     private LocalDateTime createDate;
 
     @LastModifiedDate
-    @Column(insertable = false)
+    @Column(nullable = false)
     private LocalDateTime lastModified;
 }

@@ -2,6 +2,7 @@ package com.alibou.security.quiz;
 
 import com.alibou.security.question.Question;
 import com.alibou.security.user.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -30,18 +31,32 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @ManyToOne
+
     @CreatedBy
     @JoinColumn(
             nullable = false,
             updatable = false
     )
-    private User createdBy;
+    private Integer createdBy;
+
+    private Category category;
 
     private int position;
 
-    @ManyToMany(mappedBy = "quizes")
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "quiz_question",
+            joinColumns = @JoinColumn(name = "quiz_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
+    @JsonManagedReference
     private List<Question> questions;
 
 }
+// dla quizu: get by name -> contains("fraza")
+// result: z pagingiem najwyzsze wyniki
+// getUserDetails -> liczba ukonczonych quziow
+// Question - > edit
+//
+
 //controller tylko do quiz, ktory podaje
