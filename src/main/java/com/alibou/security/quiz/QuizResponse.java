@@ -7,6 +7,7 @@ import java.util.List;
 public record QuizResponse(
         Integer id,
         int position,
+        String name,
         String category,
         List<QuestionResponse> questions
 ) {}

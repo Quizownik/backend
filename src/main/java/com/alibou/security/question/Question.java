@@ -31,6 +31,7 @@ public class Question {
 
     private String question;
 
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @OneToMany(mappedBy = "question",cascade = CascadeType.ALL, orphanRemoval = true)

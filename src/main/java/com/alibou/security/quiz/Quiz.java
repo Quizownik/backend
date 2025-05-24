@@ -31,6 +31,7 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    private String name;
 
     @CreatedBy
     @JoinColumn(
@@ -39,6 +40,7 @@ public class Quiz {
     )
     private Integer createdBy;
 
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     private int position;

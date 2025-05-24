@@ -13,6 +13,8 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     Optional<Question> findById(Long id);
     Page<Question> findByCategory(Category category, Pageable pageable);
+    List<Question> findByIdInAndCategory(List<Integer> ids, Category category);
+    List<Question> findByIdIn(List<Integer> ids);
 
 
 }
