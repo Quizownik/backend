@@ -35,25 +35,11 @@ public class QuizService {
     }
 
 
-
-    public void addQuestionsToQuiz(Integer quizId, List<Integer> questionIds) {
-        Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new RuntimeException("Quiz not found"));
-
-        List<Question> questionsToAdd = questionRepository.findAllById(questionIds);
-
-        // Dodaj tylko te, których jeszcze nie ma
-        for (Question q : questionsToAdd) {
-            if (!quiz.getQuestions().contains(q)) {
-                quiz.getQuestions().add(q);
-                q.getQuizes().add(quiz); // synchronizacja dwukierunkowej relacji
-            }
-        }
-
-        quizRepository.save(quiz);
-    }
-
-    public Quiz createQuizWithQuestions(int position, List<Integer> questionIds,Category category,String name) {
+    public Quiz createQuizWithQuestions(QuizRequest request) {
+        int position = request.position();
+        List<Integer> questionIds = request.questionIds();
+        Category category = request.category();
+        String name = category.name();
         List<Question> questions = questionRepository.findByIdInAndCategory(questionIds, category);
         Quiz quiz = Quiz.builder()
                 .position(position)

@@ -1,7 +1,5 @@
 package com.alibou.security.result;
 
-
-import com.alibou.security.question.Question;
 import com.alibou.security.quiz.Quiz;
 import com.alibou.security.user.User;
 import jakarta.persistence.*;
@@ -38,12 +36,17 @@ public class Result {
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime finishedAt;
 
-    private Duration duration;
-    //list <kolejnosc pytan>
-    //list <id_question_kotre zaznaczyles>
-    //list <id poprawna odpowiedz>
+    private Long duration; //w sekundach
 
-    @OneToMany
-    private List<Question> correctQuestions;
-    //czy dodac zapisywanie niepoprawnych odpowiedzi?
+
+    @ElementCollection
+    @CollectionTable(name = "result_question_order", joinColumns = @JoinColumn(name = "result_id"))
+    @Column(name = "question_id")
+    private List<Integer> questionOrder;  // tylko ID pytań
+
+    @ElementCollection
+    @CollectionTable(name = "result_chosen_answers", joinColumns = @JoinColumn(name = "result_id"))
+    @Column(name = "answer_id")
+    private List<Integer> chosenAnswers;
+
 }

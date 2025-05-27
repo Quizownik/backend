@@ -1,16 +1,16 @@
 package com.alibou.security.user;
 
+import com.alibou.security.result.ResultResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/user/")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -23,5 +23,17 @@ public class UserController {
     ) {
         service.changePassword(request, connectedUser);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserStatsResponse> getUserStats(@PathVariable Integer userId) {
+        return ResponseEntity.ok(service.getUserStats(userId));
+    }
+
+
+
+    @GetMapping("/topRankedUsers")
+    public ResponseEntity<List<UserRankingResponse>> getTopRankedUsers() {
+        return ResponseEntity.ok(service.getTopRankedUsers());
     }
 }

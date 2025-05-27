@@ -1,7 +1,9 @@
 package com.alibou.security.quiz;
 
-import java.util.List;
+import lombok.Builder;
 
+import java.util.List;
+@Builder
 public record QuizRequest(
         int position,
         String name,

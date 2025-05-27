@@ -29,7 +29,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "Answer")
 public class Answer {
+/*
 
+zadania:
+sprawdzic endpointy dla usera
+ */
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

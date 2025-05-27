@@ -33,7 +33,7 @@ public class QuizController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createQuiz(@RequestBody QuizRequest request) {
-        quizService.createQuizWithQuestions(request.position(), request.questionIds(),request.category(),request.name());
+        quizService.createQuizWithQuestions(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("Quiz created successfully.");
     }
 

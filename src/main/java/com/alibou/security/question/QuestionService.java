@@ -46,6 +46,32 @@ public class QuestionService {
         return toResponse(saved);
     }
 
+    public QuestionResponse createAsSystem(QuestionRequest request, Integer userId) {
+        Question question = Question.builder()
+                .question(request.question())
+                .category(request.category())
+                .createdBy(userId)
+                .lastModifiedBy(userId)
+                .build();
+
+        Question saved = questionRepository.save(question);
+
+        List<Answer> answers = request.answers().stream()
+                .map(a -> Answer.builder()
+                        .answer(a.answer())
+                        .isCorrect(a.isCorrect())
+                        .question(saved)
+                        .createdBy(userId)
+                        .lastModifiedBy(userId)
+                        .build())
+                .toList();
+
+        answerRepository.saveAll(answers);
+        saved.setAnswers(answers);
+
+        return toResponse(saved);
+    }
+
     public QuestionResponse update(Integer id, QuestionRequest request) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Question not found"));
