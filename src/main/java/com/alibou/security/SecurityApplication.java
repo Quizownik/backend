@@ -1,7 +1,5 @@
 package com.alibou.security;
 
-import com.alibou.security.answer.Answer;
-import com.alibou.security.answer.AnswerRepository;
 import com.alibou.security.answer.AnswerRequest;
 import com.alibou.security.auth.AuthenticationService;
 import com.alibou.security.auth.RegisterRequest;
@@ -9,10 +7,7 @@ import com.alibou.security.question.QuestionRepository;
 import com.alibou.security.question.QuestionRequest;
 import com.alibou.security.question.QuestionService;
 import com.alibou.security.quiz.Category;
-import com.alibou.security.quiz.QuizRequest;
 import com.alibou.security.quiz.QuizService;
-import com.alibou.security.user.Role;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -36,8 +31,8 @@ public class SecurityApplication {
 	public CommandLineRunner commandLineRunner(
 			AuthenticationService service,
 			QuestionService questionService,
-
-			QuizService quizService) {
+			QuizService quizService)
+	{
 			return args -> {
 				QuestionRepository qr;
 			var admin = RegisterRequest.builder()
