@@ -35,10 +35,10 @@ public class AuthenticationService {
     var user = User.builder()
         .firstName(request.getFirstname())
         .lastName(request.getLastname())
+        .username(request.getUsername())
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))
         .role(request.getRole())
-            .username(request.getUsername())
          .numOfDoneQuizzes(0)
          .numOfOnlyFullyCorrectQuizzes(0)
         .build();

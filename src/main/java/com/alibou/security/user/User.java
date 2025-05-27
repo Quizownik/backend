@@ -71,6 +71,11 @@ public class User implements UserDetails {
     return email;
   }
 
+
+  public String getAlias() {
+    return username;
+  }
+
   @Override
   public boolean isAccountNonExpired() {
     return true;

@@ -39,7 +39,7 @@ public class UserService {
         return repository.findTop10ByOrderByNumOfDoneQuizzesDescUsernameAsc()
                 .stream()
                 .map(user -> new UserRankingResponse(
-                        user.getUsername(),
+                        user.getAlias(),
                         user.getNumOfDoneQuizzes()
                 ))
                 .toList();

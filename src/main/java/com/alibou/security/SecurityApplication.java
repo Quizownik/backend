@@ -30,7 +30,6 @@ public class SecurityApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SecurityApplication.class, args);
-		System.out.println("Admin token : eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmNvbSIsImlhdCI6MTc0NzY2MTU0MSwiZXhwIjoxNzQ3NzQ3OTQxfQ.HqB3_uTVH18RbjLtFIqf3TVxcmE54XQCz7D-n-LADkw");
 	}
 
 	@Bean
@@ -43,7 +42,8 @@ public class SecurityApplication {
 				QuestionRepository qr;
 			var admin = RegisterRequest.builder()
 					.firstname("Admin")
-					.lastname("Admin")
+					.lastname("Adminski")
+					.username("Admineusz")
 					.email("admin@mail.com")
 					.password("password")
 					.role(ADMIN)
@@ -51,8 +51,9 @@ public class SecurityApplication {
 			System.out.println("Admin token: " + service.register(admin).getAccessToken());
 
 			var manager = RegisterRequest.builder()
-					.firstname("Admin")
-					.lastname("Admin")
+					.firstname("Menadżer")
+					.lastname("Menadżerski")
+					.username("Menadżereusz1")
 					.email("manager@mail.com")
 					.password("password")
 					.role(MANAGER)
