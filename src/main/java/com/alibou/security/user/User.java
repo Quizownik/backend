@@ -3,12 +3,13 @@ package com.alibou.security.user;
 import com.alibou.security.token.Token;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,7 +17,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "_user",
         uniqueConstraints = {@UniqueConstraint(name="student_email_unique", columnNames = "email")}
@@ -24,11 +27,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User implements UserDetails {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
-  private String firstname;
-  private String lastname;
-
+  private String firstName;
+  private String lastName;
+  private String username;
   @Column( nullable = false)
   private String email;
 
@@ -37,6 +40,18 @@ public class User implements UserDetails {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  private Integer numOfDoneQuizzes;
+
+  private Integer numOfOnlyFullyCorrectQuizzes;
+
+  @CreatedDate
+  @Column(
+          nullable = false,
+          updatable = false
+  )
+  private LocalDateTime createdDate;
+
 
   @OneToMany(mappedBy = "user")
   private List<Token> tokens;

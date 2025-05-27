@@ -29,7 +29,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "Answer")
 public class Answer {
+/*
 
+zadania:
+sprawdzic endpointy dla usera
+ */
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,7 +55,7 @@ public class Answer {
     private Integer createdBy;
 
     @LastModifiedBy
-    @Column(insertable = false)
+    @Column(nullable = false)
     private Integer lastModifiedBy;
 
     public Answer(String answer, boolean isCorrect, Question question, Integer createdBy, Integer lastModifiedBy) {

@@ -2,10 +2,12 @@ package com.alibou.security.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,5 +33,32 @@ public class UserService {
 
         // save the new password
         repository.save(user);
+    }
+
+    public List<UserRankingResponse> getTopRankedUsers() {
+        return repository.findTop10ByOrderByNumOfDoneQuizzesDescUsernameAsc()
+                .stream()
+                .map(user -> new UserRankingResponse(
+                        user.getUsername(),
+                        user.getNumOfDoneQuizzes()
+                ))
+                .toList();
+    }
+
+    public UserStatsResponse getUserStats(Integer userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+
+        return new UserStatsResponse(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getUsername(),
+                user.getRole(),
+                user.getCreatedDate(),
+                user.getNumOfDoneQuizzes(),
+                user.getNumOfOnlyFullyCorrectQuizzes()
+        );
     }
 }

@@ -15,16 +15,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnswerController {
 
-    private final AnswerService service;
-
-    @PostMapping
-    public ResponseEntity<?> save(
-            @RequestBody AnswerRequest request
-    ){
-        service.save(request);
-        return ResponseEntity.accepted().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Answer>> findAll(){return ResponseEntity.ok(service.findAll());}
+//    private final AnswerService service;
+//
+//    @PostMapping
+//    public ResponseEntity<?> save(
+//            @RequestBody AnswerRequest request
+//    ){
+//        service.save(request);
+//        return ResponseEntity.accepted().build();
+//    }
+//
+//    @GetMapping
+//    public ResponseEntity<List<Answer>> findAll(){return ResponseEntity.ok(service.findAll());}
 }

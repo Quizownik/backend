@@ -1,7 +1,9 @@
 package com.alibou.security.question;
 
 import com.alibou.security.answer.Answer;
+import com.alibou.security.quiz.Category;
 import com.alibou.security.quiz.Quiz;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -29,10 +31,15 @@ public class Question {
 
     private String question;
 
-    @OneToMany(mappedBy = "question")
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
+    @OneToMany(mappedBy = "question",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers;
 
-    @ManyToMany
+
+    @JsonBackReference
+    @ManyToMany(mappedBy = "questions")
     private List<Quiz> quizes;
 
     @CreatedBy
@@ -43,7 +50,7 @@ public class Question {
     private Integer createdBy;
 
     @LastModifiedBy
-    @Column(insertable = false)
+    @Column(nullable = false)
     private Integer lastModifiedBy;
 
     @CreatedDate
@@ -54,6 +61,6 @@ public class Question {
     private LocalDateTime createDate;
 
     @LastModifiedDate
-    @Column(insertable = false)
+    @Column(nullable = false)
     private LocalDateTime lastModified;
 }
