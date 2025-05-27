@@ -26,11 +26,9 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserStatsResponse> getUserStats(@PathVariable Integer userId) {
-        return ResponseEntity.ok(service.getUserStats(userId));
+    public ResponseEntity<UserStatsResponse> getUserStats(Principal connectedUser) {
+        return ResponseEntity.ok(service.getUserStats(connectedUser));
     }
-
-
 
     @GetMapping("/topRankedUsers")
     public ResponseEntity<List<UserRankingResponse>> getTopRankedUsers() {

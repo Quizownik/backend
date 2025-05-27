@@ -45,10 +45,8 @@ public class UserService {
                 .toList();
     }
 
-    public UserStatsResponse getUserStats(Integer userId) {
-        User user = repository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+    public UserStatsResponse getUserStats(Principal connectedUser) {
+        User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
 
         return new UserStatsResponse(
                 user.getFirstName(),
