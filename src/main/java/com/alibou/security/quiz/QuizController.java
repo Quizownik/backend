@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path="api/v1/quizes")
+@RequestMapping(path="api/v1/quizzes")
 public class QuizController {
     private final QuizService quizService;
    //    private final RequestService requestService;
