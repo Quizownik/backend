@@ -31,7 +31,7 @@ public class AuthenticationService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
 
-  public AuthenticationResponse register(RegisterRequest request) {
+  public AuthenticationResponse register2(RegisterRequest request) {
     var user = User.builder()
         .firstName(request.getFirstname())
         .lastName(request.getLastname())
@@ -50,6 +50,30 @@ public class AuthenticationService {
         .accessToken(jwtToken)
             .refreshToken(refreshToken)
         .build();
+  }
+  public AuthenticationResponse register(RegisterRequest request) {
+    if (repository.existsByEmail(request.getEmail())) {
+      throw new EmailAlreadyExistsException("Email already in use.");
+    }
+
+    var user = User.builder()
+            .firstName(request.getFirstname())
+            .lastName(request.getLastname())
+            .username(request.getUsername())
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .role(request.getRole())
+            .numOfDoneQuizzes(0)
+            .numOfOnlyFullyCorrectQuizzes(0)
+            .build();
+    var savedUser = repository.save(user);
+    var jwtToken = jwtService.generateToken(user);
+    var refreshToken = jwtService.generateRefreshToken(user);
+    saveUserToken(savedUser, jwtToken);
+    return AuthenticationResponse.builder()
+            .accessToken(jwtToken)
+            .refreshToken(refreshToken)
+            .build();
   }
 
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
