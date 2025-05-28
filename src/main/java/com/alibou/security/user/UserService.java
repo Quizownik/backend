@@ -47,12 +47,11 @@ public class UserService {
 
     public UserStatsResponse getUserStats(Principal connectedUser) {
         User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
-
         return new UserStatsResponse(
                 user.getFirstName(),
                 user.getLastName(),
+                user.getAppUsername(),
                 user.getEmail(),
-                user.getUsername(),
                 user.getRole(),
                 user.getCreatedDate(),
                 user.getNumOfDoneQuizzes(),

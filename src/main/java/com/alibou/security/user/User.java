@@ -71,6 +71,10 @@ public class User implements UserDetails {
     return email;
   }
 
+  public String getAppUsername() {
+    return username;
+  }
+
 
   public String getAlias() {
     return username;
