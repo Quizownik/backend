@@ -34,7 +34,7 @@ public class SecurityApplication {
             QuestionService questionService,
             QuizService quizService) {
         return args -> {
-            QuestionRepository qr;
+
             var admin = RegisterRequest.builder()
                     .firstname("Admin")
                     .lastname("Adminski")
@@ -55,61 +55,42 @@ public class SecurityApplication {
                     .build();
             System.out.println("Manager token: " + service.register(manager).getAccessToken());
 
-            QuestionRequest q1 = QuestionRequest.builder()
-                    .question("Czy Akwarelista wiedział?")
-                    .category(Category.Grammar)
-                    .answers(List.of(
+            QuestionRequest q1 = new QuestionRequest(
+                    "Czy Akwarelista wiedział?",
+                    Category.Grammar,
+                    List.of(
                             new AnswerRequest("Tak", true),
                             new AnswerRequest("Nie", false),
                             new AnswerRequest("Nie wiem", false),
                             new AnswerRequest("Wolałbym nie mówić", false)
-                    ))
-                    .build();
+                    )
+            );
 
-
-            var q2 = QuestionRequest.builder()
-                    .question("Kiedy odkryto Amerykę?")
-                    .category(Category.Grammar)
-                    .answers(List.of(
+            QuestionRequest q2 = new QuestionRequest(
+                    "Kiedy odkryto Amerykę?",
+                    Category.Grammar,
+                    List.of(
                             new AnswerRequest("1492", true),
                             new AnswerRequest("1776", false),
                             new AnswerRequest("1918", false),
                             new AnswerRequest("2000", false)
-                    ))
-                    .build();
+                    )
+            );
 
-            var q3 = QuestionRequest.builder()
-                    .question("Jaki jest wynik 2+2?")
-                    .category(Category.Grammar)
-                    .answers(List.of(
+            QuestionRequest q3 = new QuestionRequest(
+                    "Jaki jest wynik 2+2?",
+                    Category.Grammar,
+                    List.of(
                             new AnswerRequest("4", true),
                             new AnswerRequest("3", false),
                             new AnswerRequest("5", false),
                             new AnswerRequest("22", false)
-                    ))
-                    .build();
+                    )
+            );
+
             questionService.createAsSystem(q1, 1);
             questionService.createAsSystem(q2, 1);
             questionService.createAsSystem(q3, 1);
-//
-//				QuizRequest qu1 = QuizRequest.builder()
-//						.position(101)
-//						.name("Quiz testowy1")
-//						.category(Category.Grammar)
-//						.questionIds(List.of(1,2))
-//						.build();
-//
-//				QuizRequest qu2 = QuizRequest.builder()
-//						.position(101)
-//						.name("Quiz testowy2")
-//						.category(Category.Grammar)
-//						.questionIds(List.of(3,2))
-//						.build();
-//
-//				quizService.createQuizWithQuestions(qu1);
-//				quizService.createQuizWithQuestions(qu2);
-//			};
-
         };
     }
 }

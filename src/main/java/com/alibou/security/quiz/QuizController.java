@@ -33,8 +33,8 @@ public class QuizController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createQuiz(@RequestBody QuizRequest request) {
-        quizService.createQuizWithQuestions(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Quiz created successfully.");
+        String resultString = quizService.createQuizWithQuestions(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultString);
     }
 
     @DeleteMapping("/{id}")

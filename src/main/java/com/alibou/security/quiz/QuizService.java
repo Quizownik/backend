@@ -37,25 +37,26 @@ public class QuizService {
     }
 
 
-    public Quiz createQuizWithQuestions(QuizRequest request) {
-        int position = request.position();
-        List<Integer> questionIds = request.questionIds();
-        Category category = request.category();
-        String name = category.name();
-        List<Question> questions = questionRepository.findByIdInAndCategory(questionIds, category);
+    public String createQuizWithQuestions(QuizRequest request) {
+
+        List<Question> questions = questionRepository.findByIdInAndCategory(request.questionIds(), request.category());
         Quiz quiz = Quiz.builder()
-                .position(position)
+                .position(request.position())
                 .questions(questions)
-                .category(category)
-                .name(name)
+                .category(request.category())
+                .name(request.name())
                 .build();
 
         // Dodaj quiz do każdej relacji Question, jeśli potrzebujesz synchronizacji dwukierunkowej:
         for (Question q : questions) {
             q.getQuizes().add(quiz);
         }
+        quizRepository.save(quiz);
 
-        return quizRepository.save(quiz);
+        if(questions.size() != request.questionIds().size()) {
+            return "Some questions had incorrect category";
+        }
+        return "Quiz created successfully";
     }
 
     public void delete(Integer id) {
