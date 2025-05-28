@@ -2,11 +2,18 @@ package com.alibou.security.result;
 
 import com.alibou.security.answer.Answer;
 import com.alibou.security.answer.AnswerRepository;
+import com.alibou.security.quiz.Level;
+import com.alibou.security.quiz.Quiz;
 import com.alibou.security.quiz.QuizRepository;
+import com.alibou.security.stats.StatRespository;
+import com.alibou.security.stats.Statistics;
+import com.alibou.security.user.User;
 import com.alibou.security.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +28,7 @@ public class ResultService {
     private final UserRepository userRepository;
     private final QuizRepository quizRepository;
     private final AnswerRepository answerRepository;
+    private final StatRespository statRepository;
 
     public Result save(ResultRequest request) {
         var user = userRepository.findById(request.userId())
@@ -44,7 +52,8 @@ public class ResultService {
         }
         userRepository.save(user);
 
-        System.out.println("idzie robota");
+        Long score = (long)correctCount / chosen.size();
+        handleScoringMechanism(user,quiz,score, correctCount);
 
         Result result = new Result();
         result.setUser(user);
@@ -83,5 +92,40 @@ public class ResultService {
                 failCount
         );
     }
+    private void handleScoringMechanism(User user, Quiz quiz, Long score, Integer correctCount) {
+        var statisticsOpt = statRepository.findByQuiz(quiz);
+
+        Level currectLevel = quiz.getLevel();
+
+        int factor = Level.toInt(currectLevel);
+
+
+        user.setScore(user.getScore() + correctCount*factor);
+
+        userRepository.save(user);
+
+        //uaktualnij nowy poziom trudnosci:
+
+        Statistics statistics = statisticsOpt.orElseGet(() -> new Statistics(quiz));
+
+        Level newLevel = statistics.addScore(score);
+        quiz.setLevel(newLevel);
+        if(score> 0.98){ //osiagnal max
+            quiz.addMaster(user);
+        }
+        quizRepository.save(quiz);
+
+        statRepository.save(statistics);
+    }
+
+    public Page<ResultResponse> getResultsForCurrentUser(Pageable pageable) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return resultRepository.findAllByUserId(user.getId(), pageable)
+                .map(this::toResponse);
+    }
+
 }
 

@@ -31,5 +31,13 @@ public class ResultController {
         return ResponseEntity.ok(resultService.getAll(pageable));
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<Page<ResultResponse>> getMyResults(
+            @PageableDefault(size = 10, sort = "finishedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ResultResponse> results = resultService.getResultsForCurrentUser(pageable);
+        return ResponseEntity.ok(results);
+    }
+
+
 
 }

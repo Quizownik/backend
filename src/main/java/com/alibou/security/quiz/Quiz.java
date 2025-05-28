@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Relacja @ManyToMany między Quiz i Question ma sens tylko jeżeli:
@@ -43,6 +44,9 @@ public class Quiz {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @Enumerated(EnumType.STRING)
+    private Level level;
+
     private int position;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -54,11 +58,23 @@ public class Quiz {
     @JsonManagedReference
     private List<Question> questions;
 
-}
-// dla quizu: get by name -> contains("fraza")
-// result: z pagingiem najwyzsze wyniki
-// getUserDetails -> liczba ukonczonych quziow
-// Question - > edit
-//
 
-//controller tylko do quiz, ktory podaje
+    @ManyToMany
+    @JoinTable(
+            name = "quiz_best_users",
+            joinColumns = @JoinColumn(name = "quiz_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> mastersOfQuiz = new ArrayList<>();
+
+    public void addMaster(User user) {
+        if (!mastersOfQuiz.contains(user)) {
+            mastersOfQuiz.add(user);
+        }
+    }
+
+    public void removeMaster(User user) {
+        mastersOfQuiz.remove(user);
+    }
+
+}

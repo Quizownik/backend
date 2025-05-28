@@ -40,7 +40,7 @@ public class UserService {
                 .stream()
                 .map(user -> new UserRankingResponse(
                         user.getAlias(),
-                        user.getNumOfDoneQuizzes()
+                        user.getScore()
                 ))
                 .toList();
     }
@@ -55,7 +55,8 @@ public class UserService {
                 user.getRole(),
                 user.getCreatedDate(),
                 user.getNumOfDoneQuizzes(),
-                user.getNumOfOnlyFullyCorrectQuizzes()
+                user.getNumOfOnlyFullyCorrectQuizzes(),
+                user.getScore()
         );
     }
 }

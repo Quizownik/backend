@@ -1,5 +1,6 @@
 package com.alibou.security.user;
 
+import com.alibou.security.quiz.Quiz;
 import com.alibou.security.token.Token;
 import jakarta.persistence.*;
 
@@ -38,6 +39,7 @@ public class User implements UserDetails {
   @Column(nullable = false)
   private String password;
 
+  private Integer score;
   @Enumerated(EnumType.STRING)
   private Role role;
 
@@ -51,6 +53,9 @@ public class User implements UserDetails {
           updatable = false
   )
   private LocalDateTime createdDate;
+
+  @ManyToMany(mappedBy = "mastersOfQuiz")
+  private List<Quiz> masteredQuizzes;
 
 
   @OneToMany(mappedBy = "user")

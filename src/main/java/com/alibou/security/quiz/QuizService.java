@@ -4,14 +4,18 @@ import com.alibou.security.answer.AnswerResponse;
 import com.alibou.security.question.Question;
 import com.alibou.security.question.QuestionRepository;
 import com.alibou.security.question.QuestionResponse;
+import com.alibou.security.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.constant.ConstantDescs.NULL;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -21,14 +25,6 @@ public class QuizService {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
 
-    public void save(QuizRequest request) {
-        var quiz = Quiz.builder()
-//                .id(request.getId())
-//                .createdBy(request.getCreatedBy())
-                //         .position(request.getPosition())
-                .build();
-        quizRepository.save(quiz);
-    }
 
     public List<QuizResponse> findAll() {
         return quizRepository.findAll().stream()
@@ -45,6 +41,7 @@ public class QuizService {
                 .questions(questions)
                 .category(request.category())
                 .name(request.name())
+                .level(Level.Mixed)
                 .build();
 
         // Dodaj quiz do każdej relacji Question, jeśli potrzebujesz synchronizacji dwukierunkowej:
@@ -89,6 +86,7 @@ public class QuizService {
         return toResponse(saved);
     }
 
+
     private QuizResponse toResponse(Quiz quiz) {
         List<QuestionResponse> questionResponses = quiz.getQuestions().stream()
                 .map(q -> new QuestionResponse(
@@ -105,27 +103,62 @@ public class QuizService {
                 ))
                 .toList();
 
+
+
         return new QuizResponse(
                 quiz.getId(),
                 quiz.getPosition(),
                 quiz.getName(),
                 quiz.getCategory().toString(),
-                questionResponses
+                questionResponses,
+                quiz.getLevel().toString(),
+                false
         );
     }
 
+    private QuizResponse toResponseWithMastered(Quiz quiz, User user) {
+        List<QuestionResponse> questionResponses = quiz.getQuestions().stream()
+                .map(q -> new QuestionResponse(
+                        q.getId(),
+                        q.getQuestion(),
+                        q.getCategory(),
+                        q.getAnswers().stream()
+                                .map(a -> new AnswerResponse(
+                                        a.getId(),
+                                        a.getAnswer(),
+                                        a.isCorrect()
+                                ))
+                                .toList()
+                ))
+                .toList();
 
-    public Page<QuizResponse> getQuizzes(Category category, Pageable pageable) {
+        boolean isMastered = quiz.getMastersOfQuiz().contains(user);
+
+        return new QuizResponse(
+                quiz.getId(),
+                quiz.getPosition(),
+                quiz.getName(),
+                quiz.getCategory().toString(),
+                questionResponses,
+                quiz.getLevel().toString(),
+                isMastered
+        );
+    }
+
+    public Page<QuizResponse> getQuizzes(Category category, Pageable pageable, Principal connectedUser) {
         Page<Quiz> page;
 
-        if (category != null) {
+        if (category != Category.Mixed) {
             page = quizRepository.findAllByCategory(category, pageable);
         } else {
             page = quizRepository.findAll(pageable);
         }
 
-        return page.map(this::toResponse);
+        User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+        return page.map(quiz -> toResponseWithMastered(quiz, user));
     }
+
 
 }
 

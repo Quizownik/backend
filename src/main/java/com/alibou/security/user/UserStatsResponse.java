@@ -1,5 +1,7 @@
 package com.alibou.security.user;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+
 import java.time.LocalDateTime;
 
 public record UserStatsResponse(
@@ -10,5 +12,6 @@ public record UserStatsResponse(
         Role role,
         LocalDateTime createdDate,
         Integer numOfDoneQuizzes,
-        Integer numOfOnlyFullyCorrectQuizzes
+        Integer numOfOnlyFullyCorrectQuizzes,
+        Integer score
 ) {}

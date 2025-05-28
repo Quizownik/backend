@@ -9,5 +9,7 @@ public record QuizResponse(
         int position,
         String name,
         String category,
-        List<QuestionResponse> questions
+        List<QuestionResponse> questions,
+        String level,
+        boolean isMastered
 ) {}
