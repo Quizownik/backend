@@ -19,7 +19,7 @@ public class QuizController {
    //    private final RequestService requestService;
 
     @GetMapping
-    public ResponseEntity<List<Quiz>> findAll() {return ResponseEntity.ok(quizService.findAll());}
+    public ResponseEntity<List<QuizResponse>> findAll() {return ResponseEntity.ok(quizService.findAll());}
 
     @GetMapping("/sorted") //tutaj jest zle z DTO dla question
     public ResponseEntity<Page<QuizResponse>> getQuizzes(

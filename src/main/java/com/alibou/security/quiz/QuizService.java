@@ -30,8 +30,10 @@ public class QuizService {
         quizRepository.save(quiz);
     }
 
-    public List<Quiz> findAll() {
-        return quizRepository.findAll();
+    public List<QuizResponse> findAll() {
+        return quizRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
 
