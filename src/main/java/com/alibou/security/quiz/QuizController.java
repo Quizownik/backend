@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -23,10 +24,11 @@ public class QuizController {
 
     @GetMapping("/sorted") //tutaj jest zle z DTO dla question
     public ResponseEntity<Page<QuizResponse>> getQuizzes(
-            @RequestParam(required = false) Category category,
-            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
+            @RequestParam(required = true) Category category,
+            @PageableDefault(size = 10, sort = "name") Pageable pageable,
+            Principal connectedUser) {
 
-        Page<QuizResponse> result = quizService.getQuizzes(category, pageable);
+        Page<QuizResponse> result = quizService.getQuizzes(category, pageable, connectedUser);
         return ResponseEntity.ok(result);
     }
 

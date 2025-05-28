@@ -65,6 +65,7 @@ public class AuthenticationService {
             .role(request.getRole())
             .numOfDoneQuizzes(0)
             .numOfOnlyFullyCorrectQuizzes(0)
+            .score(0)
             .build();
     var savedUser = repository.save(user);
     var jwtToken = jwtService.generateToken(user);

@@ -1,0 +1,63 @@
+package com.alibou.security.stats;
+
+import com.alibou.security.quiz.Level;
+import com.alibou.security.quiz.Quiz;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import static org.apache.commons.lang3.math.NumberUtils.max;
+@Data
+@With
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Builder
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "statistics")
+public class Statistics {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "quiz_id")
+    private Quiz quiz;
+
+    private Integer completedAttempts;
+
+    public Level addScore(Long score){
+        if(score >= 0.85){
+            this.highScoreAttempts++;
+        }else if(score >= 0.60){
+            this.mediumScoreAttempts++;
+        }else{
+            this.lowScoreAttempts++;
+        }
+        this.completedAttempts++;
+
+        if(this.highScoreAttempts == max(highScoreAttempts, mediumScoreAttempts, lowScoreAttempts)){
+            return Level.Hard;
+        }
+        if(this.mediumScoreAttempts == max(highScoreAttempts, mediumScoreAttempts, lowScoreAttempts)){
+            return Level.Medium;
+        }
+        return Level.Easy;
+    }
+
+    public Statistics(Quiz quiz) {
+        this.quiz = quiz;
+        this.completedAttempts = 0;
+        this.highScoreAttempts = 0;
+        this.mediumScoreAttempts = 0;
+        this.lowScoreAttempts = 0;
+    }
+
+    private Integer lowScoreAttempts;
+
+    private Integer mediumScoreAttempts;
+
+    private Integer highScoreAttempts;
+
+}
