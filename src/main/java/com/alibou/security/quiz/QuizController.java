@@ -17,18 +17,25 @@ import java.util.List;
 @RequestMapping(path="api/v1/quizzes")
 public class QuizController {
     private final QuizService quizService;
-   //    private final RequestService requestService;
+
 
     @GetMapping
     public ResponseEntity<List<QuizResponse>> findAll() {return ResponseEntity.ok(quizService.findAll());}
 
-    @GetMapping("/sorted") //tutaj jest zle z DTO dla question
-    public ResponseEntity<Page<QuizResponse>> getQuizzes(
+    @GetMapping("/sorted")
+    public ResponseEntity<Page<QuizLabelResponse>> getLabelQuizzes(
             @RequestParam(required = true) Category category,
             @PageableDefault(size = 10, sort = "name") Pageable pageable,
             Principal connectedUser) {
 
-        Page<QuizResponse> result = quizService.getQuizzes(category, pageable, connectedUser);
+        Page<QuizLabelResponse> result = quizService.getLabelQuizzes(category, pageable, connectedUser);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<QuizResponse> getQuiz(Integer id) {
+
+        QuizResponse result = quizService.getQuiz(id);
         return ResponseEntity.ok(result);
     }
 

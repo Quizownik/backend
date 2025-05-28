@@ -12,10 +12,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.constant.ConstantDescs.NULL;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -24,6 +24,7 @@ public class QuizService {
 
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
+
 
 
     public List<QuizResponse> findAll() {
@@ -35,7 +36,12 @@ public class QuizService {
 
     public String createQuizWithQuestions(QuizRequest request) {
 
-        List<Question> questions = questionRepository.findByIdInAndCategory(request.questionIds(), request.category());
+        List<Question> questions;
+        if(request.category() != Category.Mixed){
+            questions = questionRepository.findByIdInAndCategory(request.questionIds(), request.category());
+        }else{
+            questions = questionRepository.findByIdIn(request.questionIds());
+        }
         Quiz quiz = Quiz.builder()
                 .position(request.position())
                 .questions(questions)
@@ -44,7 +50,6 @@ public class QuizService {
                 .level(Level.Mixed)
                 .build();
 
-        // Dodaj quiz do każdej relacji Question, jeśli potrzebujesz synchronizacji dwukierunkowej:
         for (Question q : questions) {
             q.getQuizes().add(quiz);
         }
@@ -60,11 +65,11 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        // 1. Usuń relacje między Quiz a Question
+
         for (Question question : quiz.getQuestions()) {
-            question.getQuizes().remove(quiz); // usuń quiz z pytania
+            question.getQuizes().remove(quiz);
         }
-        quiz.getQuestions().clear(); // usuń pytania z quiz
+        quiz.getQuestions().clear();
         quizRepository.save(quiz);
         quizRepository.deleteById(id);
     }
@@ -73,12 +78,9 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        // Zaktualizuj pola
         quiz.setPosition(request.position());
         quiz.setName(request.name());
 
-
-        // Pytania po ID i kategorii (opcjonalnie filtruj po kategorii)
         List<Question> updatedQuestions = questionRepository.findByIdIn(request.questionIds());
         quiz.setQuestions(updatedQuestions);
 
@@ -103,49 +105,31 @@ public class QuizService {
                 ))
                 .toList();
 
-
-
         return new QuizResponse(
                 quiz.getId(),
                 quiz.getPosition(),
                 quiz.getName(),
                 quiz.getCategory().toString(),
                 questionResponses,
-                quiz.getLevel().toString(),
-                false
+                quiz.getLevel().toString()
         );
     }
 
-    private QuizResponse toResponseWithMastered(Quiz quiz, User user) {
-        List<QuestionResponse> questionResponses = quiz.getQuestions().stream()
-                .map(q -> new QuestionResponse(
-                        q.getId(),
-                        q.getQuestion(),
-                        q.getCategory(),
-                        q.getAnswers().stream()
-                                .map(a -> new AnswerResponse(
-                                        a.getId(),
-                                        a.getAnswer(),
-                                        a.isCorrect()
-                                ))
-                                .toList()
-                ))
-                .toList();
+    private QuizLabelResponse toLabelResponse(Quiz quiz, User user) {
 
         boolean isMastered = quiz.getMastersOfQuiz().contains(user);
 
-        return new QuizResponse(
+        return new QuizLabelResponse(
                 quiz.getId(),
                 quiz.getPosition(),
                 quiz.getName(),
                 quiz.getCategory().toString(),
-                questionResponses,
                 quiz.getLevel().toString(),
                 isMastered
         );
     }
 
-    public Page<QuizResponse> getQuizzes(Category category, Pageable pageable, Principal connectedUser) {
+    public Page<QuizLabelResponse> getLabelQuizzes(Category category, Pageable pageable, Principal connectedUser) {
         Page<Quiz> page;
 
         if (category != Category.Mixed) {
@@ -156,7 +140,12 @@ public class QuizService {
 
         User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
 
-        return page.map(quiz -> toResponseWithMastered(quiz, user));
+        return page.map(quiz -> toLabelResponse(quiz, user));
+    }
+
+    public QuizResponse getQuiz(Integer id) {
+        Quiz quiz = quizRepository.getById(id);
+        return toResponse(quiz);
     }
 
 

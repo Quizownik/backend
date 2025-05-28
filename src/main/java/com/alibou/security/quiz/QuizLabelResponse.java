@@ -4,11 +4,11 @@ import com.alibou.security.question.QuestionResponse;
 
 import java.util.List;
 
-public record QuizResponse(
+public record QuizLabelResponse(
         Integer id,
         int position,
         String name,
         String category,
-        List<QuestionResponse> questions,
-        String level
+        String level,
+        boolean isMastered
 ) {}
