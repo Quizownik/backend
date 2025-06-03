@@ -37,7 +37,4 @@ public class ResultController {
         Page<ResultResponse> results = resultService.getResultsForCurrentUser(pageable);
         return ResponseEntity.ok(results);
     }
-
-
-
 }

@@ -13,5 +13,6 @@ public record UserStatsResponse(
         LocalDateTime createdDate,
         Integer numOfDoneQuizzes,
         Integer numOfOnlyFullyCorrectQuizzes,
-        Integer score
+        Integer score,
+        Integer id
 ) {}

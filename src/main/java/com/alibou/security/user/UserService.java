@@ -56,7 +56,8 @@ public class UserService {
                 user.getCreatedDate(),
                 user.getNumOfDoneQuizzes(),
                 user.getNumOfOnlyFullyCorrectQuizzes(),
-                user.getScore()
+                user.getScore(),
+                user.getId()
         );
     }
 }
