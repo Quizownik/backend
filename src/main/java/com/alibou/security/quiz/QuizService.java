@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class QuizService {
     }
 
 
+    @Transactional
     public String createQuizWithQuestions(QuizRequest request) {
 
         List<Question> questions;
