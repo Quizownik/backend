@@ -118,8 +118,8 @@ public class QuizService {
     }
 
     private QuizLabelResponse toLabelResponse(Quiz quiz, User user) {
-
-        boolean isMastered = quiz.getMastersOfQuiz().contains(user);
+        boolean isMastered = quiz.getMastersOfQuiz().stream()
+                .anyMatch(master -> master.getId().equals(user.getId()));
 
         return new QuizLabelResponse(
                 quiz.getId(),
