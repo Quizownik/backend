@@ -33,7 +33,7 @@ public class QuizController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<QuizResponse> getQuiz(Integer id) {
+    public ResponseEntity<QuizResponse> getQuiz(@PathVariable Integer id) {
 
         QuizResponse result = quizService.getQuiz(id);
         return ResponseEntity.ok(result);
