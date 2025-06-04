@@ -127,7 +127,8 @@ public class QuizService {
                 quiz.getName(),
                 quiz.getCategory().toString(),
                 quiz.getLevel().toString(),
-                isMastered
+                isMastered,
+                quiz.getQuestions().size()
         );
     }
 
