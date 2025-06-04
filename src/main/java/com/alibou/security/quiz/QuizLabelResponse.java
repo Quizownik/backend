@@ -10,5 +10,6 @@ public record QuizLabelResponse(
         String name,
         String category,
         String level,
-        boolean isMastered
+        boolean isMastered,
+        Integer numberOfQuestions
 ) {}
