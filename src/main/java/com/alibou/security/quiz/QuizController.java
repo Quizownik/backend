@@ -32,6 +32,17 @@ public class QuizController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/sorted2params")
+    public ResponseEntity<Page<QuizLabelResponse>> getLabelQuizzes2params(
+            @RequestParam(required = true) Category category,
+            @RequestParam(required = true) Level level,
+            @PageableDefault(size = 10, sort = "name") Pageable pageable,
+            Principal connectedUser) {
+
+        Page<QuizLabelResponse> result = quizService.getLabelQuizzes2(category,level, pageable, connectedUser);
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<QuizResponse> getQuiz(@PathVariable Integer id) {
 

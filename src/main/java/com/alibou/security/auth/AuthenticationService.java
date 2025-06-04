@@ -13,9 +13,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
@@ -77,24 +80,57 @@ public class AuthenticationService {
             .build();
   }
 
+//  public AuthenticationResponse authenticate(AuthenticationRequest request) { orginalny
+//    authenticationManager.authenticate(
+//        new UsernamePasswordAuthenticationToken(
+//            request.getEmail(),
+//            request.getPassword()
+//        )
+//    );
+//    var user = repository.findByEmail(request.getEmail())
+//        .orElseThrow();
+//    var jwtToken = jwtService.generateToken(user);
+//    var refreshToken = jwtService.generateRefreshToken(user);
+//    revokeAllUserTokens(user);
+//    saveUserToken(user, jwtToken);
+//    return AuthenticationResponse.builder()
+//        .accessToken(jwtToken)
+//            .refreshToken(refreshToken)
+//        .build();
+//  }
+
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            request.getEmail(),
-            request.getPassword()
-        )
-    );
+    try {
+      authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(
+                      request.getEmail(),
+                      request.getPassword()
+              )
+      );
+    } catch (AuthenticationException ex) {
+      // Zły email lub hasło
+      throw new BadCredentialsException("Invalid email or password");
+    }
+
+    // Jeśli użytkownik istnieje — pobierz
     var user = repository.findByEmail(request.getEmail())
-        .orElseThrow();
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    // Generuj tokeny
     var jwtToken = jwtService.generateToken(user);
     var refreshToken = jwtService.generateRefreshToken(user);
+
+    // Wycofaj poprzednie tokeny i zapisz nowy
     revokeAllUserTokens(user);
     saveUserToken(user, jwtToken);
+
+    // Zwróć odpowiedź
     return AuthenticationResponse.builder()
-        .accessToken(jwtToken)
+            .accessToken(jwtToken)
             .refreshToken(refreshToken)
-        .build();
+            .build();
   }
+
 
   private void saveUserToken(User user, String jwtToken) {
     var token = Token.builder()

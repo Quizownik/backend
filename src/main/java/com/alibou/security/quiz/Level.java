@@ -4,7 +4,8 @@ public enum Level {
     Easy,
     Medium,
     Hard,
-    Mixed;
+    Mixed,
+    Default;
 
     public static int toInt(Level level) {
         return switch (level) {
@@ -12,6 +13,7 @@ public enum Level {
             case Medium -> 3;
             case Hard -> 5;
             case Mixed -> 1;
+            default -> 0;
         };
     }
 }

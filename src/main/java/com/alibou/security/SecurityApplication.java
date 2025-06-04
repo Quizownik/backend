@@ -52,7 +52,7 @@ public class SecurityApplication {
                     .lastname("Menadżerski")
                     .username("Menadżereusz1")
                     .email("manager@mail.com")
-                    .password("password")
+                    .password("password123!")
                     .role(MANAGER)
                     .build();
             System.out.println("Manager token: " + service.register(manager).getAccessToken());
@@ -663,7 +663,6 @@ public class SecurityApplication {
                     }
                 }
                 QuizRequest quizRequest = new QuizRequest(
-                        i,
                         "Quiz " + i,
                         category,
                         questionIds

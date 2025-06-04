@@ -5,8 +5,7 @@ import com.alibou.security.question.QuestionResponse;
 import java.util.List;
 
 public record QuizResponse(
-        Integer id,
-        int position,
+        Long id,
         String name,
         String category,
         List<QuestionResponse> questions,

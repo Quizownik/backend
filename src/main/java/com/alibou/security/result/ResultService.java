@@ -5,7 +5,7 @@ import com.alibou.security.answer.AnswerRepository;
 import com.alibou.security.quiz.Level;
 import com.alibou.security.quiz.Quiz;
 import com.alibou.security.quiz.QuizRepository;
-import com.alibou.security.stats.StatRespository;
+import com.alibou.security.stats.StatRepository;
 import com.alibou.security.stats.Statistics;
 import com.alibou.security.user.User;
 import com.alibou.security.user.UserRepository;
@@ -28,7 +28,7 @@ public class ResultService {
     private final UserRepository userRepository;
     private final QuizRepository quizRepository;
     private final AnswerRepository answerRepository;
-    private final StatRespository statRepository;
+    private final StatRepository statRepository;
 
     public Result save(ResultRequest request) {
         var user = userRepository.findById(request.userId())
@@ -84,6 +84,7 @@ public class ResultService {
         return new ResultResponse(
                 result.getQuiz().getId(),
                 result.getUser().getId(),
+                result.getQuiz().getName(),
                 result.getFinishedAt(),
                 result.getDuration(),
                 result.getQuestionOrder(),
@@ -95,12 +96,20 @@ public class ResultService {
     private void handleScoringMechanism(User user, Quiz quiz, Long score, Integer correctCount) {
         var statisticsOpt = statRepository.findByQuiz(quiz);
 
-        Level currectLevel = quiz.getLevel();
+        Level currentLevel = quiz.getLevel();
 
-        int factor = Level.toInt(currectLevel);
+       int factor = Level.toInt(currentLevel);
 
 
-        user.setScore(user.getScore() + correctCount*factor);
+        if (score < 0.4) {
+            int temp = user.getScore() - correctCount *factor;
+            if(temp < 0){
+                temp = 0;
+            }
+            user.setScore(temp);
+        }else{
+            user.setScore(user.getScore() + correctCount * factor); //*factor
+        }
 
         userRepository.save(user);
 

@@ -4,6 +4,8 @@ import com.alibou.security.answer.AnswerResponse;
 import com.alibou.security.question.Question;
 import com.alibou.security.question.QuestionRepository;
 import com.alibou.security.question.QuestionResponse;
+import com.alibou.security.result.ResultRepository;
+import com.alibou.security.stats.StatRepository;
 import com.alibou.security.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,11 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
+
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +25,8 @@ public class QuizService {
 
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
-
+    private final ResultRepository resultRepository;
+    private final StatRepository statRepository;
 
 
     public List<QuizResponse> findAll() {
@@ -45,7 +46,6 @@ public class QuizService {
             questions = questionRepository.findByIdIn(request.questionIds());
         }
         Quiz quiz = Quiz.builder()
-                .position(request.position())
                 .questions(questions)
                 .category(request.category())
                 .name(request.name())
@@ -62,7 +62,7 @@ public class QuizService {
         }
         return "Quiz created successfully";
     }
-
+    @Transactional
     public void delete(Integer id) {
         Quiz quiz = quizRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
@@ -72,7 +72,9 @@ public class QuizService {
             question.getQuizes().remove(quiz);
         }
         quiz.getQuestions().clear();
+        statRepository.deleteAllByQuiz(quiz);
         quizRepository.save(quiz);
+        resultRepository.deleteAllByQuiz(quiz);
         quizRepository.deleteById(id);
     }
 
@@ -80,7 +82,6 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        quiz.setPosition(request.position());
         quiz.setName(request.name());
 
         List<Question> updatedQuestions = questionRepository.findByIdIn(request.questionIds());
@@ -109,7 +110,6 @@ public class QuizService {
 
         return new QuizResponse(
                 quiz.getId(),
-                quiz.getPosition(),
                 quiz.getName(),
                 quiz.getCategory().toString(),
                 questionResponses,
@@ -123,7 +123,6 @@ public class QuizService {
 
         return new QuizLabelResponse(
                 quiz.getId(),
-                quiz.getPosition(),
                 quiz.getName(),
                 quiz.getCategory().toString(),
                 quiz.getLevel().toString(),
@@ -135,13 +134,52 @@ public class QuizService {
     public Page<QuizLabelResponse> getLabelQuizzes(Category category, Pageable pageable, Principal connectedUser) {
         Page<Quiz> page;
 
-        if (category != Category.Mixed) {
+        if (category != Category.All) {
             page = quizRepository.findAllByCategory(category, pageable);
         } else {
             page = quizRepository.findAll(pageable);
         }
 
         User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+        return page.map(quiz -> toLabelResponse(quiz, user));
+    }
+
+    public Page<QuizLabelResponse> getLabelQuizzes2(Category category,Level level, Pageable pageable, Principal connectedUser) {
+        Page<Quiz> page;
+
+        User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+        int userScore = user.getScore();
+        if(level == Level.Default){
+            if( userScore > 30 ){
+                level = Level.Hard;
+            }
+            else if (userScore < 15){
+                level = Level.Medium;
+            }else{
+                level = Level.Easy;
+            }
+
+        }
+
+
+
+        if (level != Level.Mixed) {
+            if (category != Category.All) {
+                page = quizRepository.findAllByCategoryAndLevel(category,level, pageable);
+            }else{
+                page = quizRepository.findAllByLevel(level, pageable);
+            }
+        } else {
+            if (category != Category.All) {
+                page = quizRepository.findAllByCategory(category, pageable);
+            } else {
+                page = quizRepository.findAll(pageable);
+            }
+        }
+
+
 
         return page.map(quiz -> toLabelResponse(quiz, user));
     }

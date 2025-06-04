@@ -30,7 +30,7 @@ public class Quiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -46,8 +46,6 @@ public class Quiz {
 
     @Enumerated(EnumType.STRING)
     private Level level;
-
-    private int position;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(

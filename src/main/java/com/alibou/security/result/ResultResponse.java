@@ -7,8 +7,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record ResultResponse(
-        Integer quizId,
+        Long quizId,
         Integer userId,
+        String quizName,
         LocalDateTime finishedAt,
         Long duration,
         List<Integer> questionOrder,

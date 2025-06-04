@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ResultRepository  extends JpaRepository<Result, Integer> {
     Page<Result> findAllByUserId(Integer userId, Pageable pageable);
+
+
+    void deleteAllByQuiz(Quiz quiz);
+
 }

@@ -9,4 +9,7 @@ import java.util.Optional;
 public interface QuizRepository extends JpaRepository<Quiz, Integer> {
     Page<Quiz> findAllByCategory(Category category, Pageable pageable);
 
+    Page<Quiz> findAllByCategoryAndLevel(Category category, Level level, Pageable pageable);
+
+    Page<Quiz> findAllByLevel(Level level, Pageable pageable);
 }

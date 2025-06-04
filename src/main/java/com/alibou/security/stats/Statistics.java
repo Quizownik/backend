@@ -28,9 +28,9 @@ public class Statistics {
     private Integer completedAttempts;
 
     public Level addScore(Long score){
-        if(score >= 0.85){
+        if(score >= 0.75){
             this.highScoreAttempts++;
-        }else if(score >= 0.60){
+        }else if(score >= 0.40){
             this.mediumScoreAttempts++;
         }else{
             this.lowScoreAttempts++;
@@ -38,12 +38,12 @@ public class Statistics {
         this.completedAttempts++;
 
         if(this.highScoreAttempts == max(highScoreAttempts, mediumScoreAttempts, lowScoreAttempts)){
-            return Level.Hard;
+            return Level.Easy;
         }
         if(this.mediumScoreAttempts == max(highScoreAttempts, mediumScoreAttempts, lowScoreAttempts)){
             return Level.Medium;
         }
-        return Level.Easy;
+        return Level.Hard;
     }
 
     public Statistics(Quiz quiz) {
