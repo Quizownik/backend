@@ -81,8 +81,15 @@ public class QuestionService {
 
         questionRepository.save(question);
 
-        // Usuń stare odpowiedzi i zapisz nowe
-        answerRepository.deleteById(id);
+        // Get all answers for the question
+        List<Answer> existingAnswers = answerRepository.findByQuestionId(id);
+
+        // Delete existing answers
+        existingAnswers.forEach(answer -> {
+            answer.setQuestion(null); // Unlink the answer from the question
+            answerRepository.delete(answer); // Delete the answer
+        });
+
         List<Answer> newAnswers = request.answers().stream()
                 .map(a -> Answer.builder()
                         .answer(a.answer())
