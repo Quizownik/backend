@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -28,10 +29,16 @@ public class AuthenticationController {
     }
   }
   @PostMapping("/authenticate")
-  public ResponseEntity<AuthenticationResponse> authenticate(
-      @RequestBody AuthenticationRequest request
+  public ResponseEntity<?> authenticate(
+          @RequestBody AuthenticationRequest request
   ) {
-    return ResponseEntity.ok(service.authenticate(request));
+    try {
+      return ResponseEntity.ok(service.authenticate(request));
+    } catch (BadCredentialsException e) {
+      return ResponseEntity
+              .status(HttpStatus.UNAUTHORIZED)
+              .body(Map.of("error", "Nieprawidłowy login lub hasło"));
+    }
   }
 
   @PostMapping("/refresh-token")
