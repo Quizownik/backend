@@ -6,10 +6,6 @@ import com.alibou.security.answer.AnswerResponse;
 import com.alibou.security.quiz.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +22,7 @@ public class QuestionService {
 
         Question question = Question.builder()
                 .question(request.question())
+                .level(request.level())
                 .category(request.category())
                 .createdBy(currentUserId)
                 .build();
@@ -49,6 +46,7 @@ public class QuestionService {
     public QuestionResponse createAsSystem(QuestionRequest request, Integer userId) {
         Question question = Question.builder()
                 .question(request.question())
+                .level(request.level())
                 .category(request.category())
                 .createdBy(userId)
                 .lastModifiedBy(userId)
@@ -77,6 +75,7 @@ public class QuestionService {
                 .orElseThrow(() -> new RuntimeException("Question not found"));
 
         question.setQuestion(request.question());
+        question.setLevel(request.level());
         question.setCategory(request.category());
 
         questionRepository.save(question);
@@ -116,6 +115,7 @@ public class QuestionService {
         return new QuestionResponse(
                 question.getId(),
                 question.getQuestion(),
+                question.getLevel(),
                 question.getCategory(),
                 answers
         );

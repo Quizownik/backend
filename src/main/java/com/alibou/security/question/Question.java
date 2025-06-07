@@ -2,6 +2,7 @@ package com.alibou.security.question;
 
 import com.alibou.security.answer.Answer;
 import com.alibou.security.quiz.Category;
+import com.alibou.security.quiz.Level;
 import com.alibou.security.quiz.Quiz;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -30,6 +31,8 @@ public class Question {
     private Integer id;
 
     private String question;
+
+    private Level level;
 
     @Enumerated(EnumType.STRING)
     private Category category;
