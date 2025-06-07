@@ -71,14 +71,10 @@ public class QuizController {
         return ResponseEntity.ok(updated);
     }
 
-    @GetMapping("/generate")
-    public ResponseEntity<QuizResponse> generateQuiz(
-            @RequestParam() String name,
-            @RequestParam() Category category,
-            @RequestParam() Level level,
-            @RequestParam() Integer numberOfQuestions) {
+    @PostMapping("/generate")
+    public ResponseEntity<QuizResponse> generateQuiz(@RequestBody QuizGenerateRequest request) {
 
-        QuizResponse generatedQuiz = quizService.generateQuiz(name, category, level, numberOfQuestions);
+        QuizResponse generatedQuiz = quizService.generateQuiz(request);
         return ResponseEntity.ok(generatedQuiz);
     }
 }

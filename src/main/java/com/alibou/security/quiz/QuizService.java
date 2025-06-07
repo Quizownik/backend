@@ -193,7 +193,21 @@ public class QuizService {
     }
 
 
-    public QuizResponse generateQuiz(String name, Category category, Level level, Integer numberOfQuestions) {
+    public QuizResponse generateQuiz(QuizGenerateRequest request) {
+
+        String name = request.name();
+        Category category = request.category();
+        if(category == null) {
+            category = Category.Mixed;
+        }
+        Level level = request.level();
+        if(level == null) {
+            level = Level.Easy;
+        }
+        Integer numberOfQuestions = request.numberOfQuestions();
+        if (numberOfQuestions == null || numberOfQuestions <= 0) {
+            numberOfQuestions = 10; // Default number of questions
+        }
         List<Question> questions;
         if(category != Category.Mixed){
             questions = questionRepository.findRandomByCategoryAndLevel(category,  numberOfQuestions, level);
