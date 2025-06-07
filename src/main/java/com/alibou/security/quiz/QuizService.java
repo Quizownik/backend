@@ -187,10 +187,33 @@ public class QuizService {
     }
 
     public QuizResponse getQuiz(Integer id) {
-        Quiz quiz = quizRepository.getById(id);
+        Quiz quiz = quizRepository.getReferenceById(id);
         return toResponse(quiz);
     }
 
 
+    public QuizResponse generateQuiz(String name, Category category, Level level, Integer numberOfQuestions) {
+        List<Question> questions;
+        if(category != Category.Mixed){
+            questions = questionRepository.findRandomByCategory(category, numberOfQuestions);
+        }else{
+            questions = questionRepository.findRandom(numberOfQuestions);
+        }
+
+        Quiz quiz = Quiz.builder()
+                .questions(questions)
+                .category(category)
+                .level(level)
+                .name(name)
+                .build();
+
+        for (Question q : questions) {
+            q.getQuizes().add(quiz);
+        }
+
+        quizRepository.save(quiz);
+
+        return toResponse(quiz);
+    }
 }
 
