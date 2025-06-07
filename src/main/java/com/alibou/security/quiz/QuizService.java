@@ -99,6 +99,7 @@ public class QuizService {
                 .map(q -> new QuestionResponse(
                         q.getId(),
                         q.getQuestion(),
+                        q.getLevel(),
                         q.getCategory(),
                         q.getAnswers().stream()
                                 .map(a -> new AnswerResponse(
