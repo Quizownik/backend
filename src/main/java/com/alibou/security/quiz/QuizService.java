@@ -84,6 +84,8 @@ public class QuizService {
 
         quiz.setName(request.name());
 
+        quiz.setCategory(request.category());
+
         List<Question> updatedQuestions = questionRepository.findByIdIn(request.questionIds());
         quiz.setQuestions(updatedQuestions);
 
@@ -97,6 +99,7 @@ public class QuizService {
                 .map(q -> new QuestionResponse(
                         q.getId(),
                         q.getQuestion(),
+                        q.getLevel(),
                         q.getCategory(),
                         q.getAnswers().stream()
                                 .map(a -> new AnswerResponse(
@@ -185,10 +188,47 @@ public class QuizService {
     }
 
     public QuizResponse getQuiz(Integer id) {
-        Quiz quiz = quizRepository.getById(id);
+        Quiz quiz = quizRepository.getReferenceById(id);
         return toResponse(quiz);
     }
 
 
+    public QuizResponse generateQuiz(QuizGenerateRequest request) {
+
+        String name = request.name();
+        Category category = request.category();
+        if(category == null) {
+            category = Category.Mixed;
+        }
+        Level level = request.level();
+        if(level == null) {
+            level = Level.Easy;
+        }
+        Integer numberOfQuestions = request.numberOfQuestions();
+        if (numberOfQuestions == null || numberOfQuestions <= 0) {
+            numberOfQuestions = 10; // Default number of questions
+        }
+        List<Question> questions;
+        if(category != Category.Mixed){
+            questions = questionRepository.findRandomByCategoryAndLevel(category,  numberOfQuestions, level);
+        }else{
+            questions = questionRepository.findRandom(numberOfQuestions, level);
+        }
+
+        Quiz quiz = Quiz.builder()
+                .questions(questions)
+                .category(category)
+                .level(level)
+                .name(name)
+                .build();
+
+        for (Question q : questions) {
+            q.getQuizes().add(quiz);
+        }
+
+        quizRepository.save(quiz);
+
+        return toResponse(quiz);
+    }
 }
 

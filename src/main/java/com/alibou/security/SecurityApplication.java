@@ -8,6 +8,7 @@ import com.alibou.security.question.QuestionRequest;
 import com.alibou.security.question.QuestionResponse;
 import com.alibou.security.question.QuestionService;
 import com.alibou.security.quiz.Category;
+import com.alibou.security.quiz.Level;
 import com.alibou.security.quiz.QuizRequest;
 import com.alibou.security.quiz.QuizService;
 import org.springframework.boot.CommandLineRunner;
@@ -77,6 +78,7 @@ public class SecurityApplication {
             // --- Initial questions provided in the example (retained for consistency) ---
             QuestionRequest q1 = new QuestionRequest(
                     "Which sentence is grammatically correct?",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("The watercolorist knew the answer.", true),
@@ -90,6 +92,7 @@ public class SecurityApplication {
 
             QuestionRequest q2 = new QuestionRequest(
                     "Choose the sentence with correct punctuation.",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("When was America discovered?", true),
@@ -103,6 +106,7 @@ public class SecurityApplication {
 
             QuestionRequest q3 = new QuestionRequest(
                     "Select the sentence with correct subject-verb agreement.",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Two plus two equals four.", true),
@@ -117,6 +121,7 @@ public class SecurityApplication {
             // --- Generate 20 Vocabulary Questions ---
             QuestionRequest vocabQ1 = new QuestionRequest(
                     "What is a synonym for 'beautiful'?",
+                    Level.Easy,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Pretty", true),
@@ -130,6 +135,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ2 = new QuestionRequest(
                     "What does 'ephemeral' mean?",
+                    Level.Easy,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Lasting for a short time", true),
@@ -143,6 +149,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ3 = new QuestionRequest(
                     "Choose the antonym for 'hot'.",
+                    Level.Easy,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Cold", true),
@@ -156,6 +163,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ4 = new QuestionRequest(
                     "What is a 'paradox'?",
+                    Level.Easy,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("A seemingly self-contradictory statement that may nonetheless be true", true),
@@ -169,6 +177,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ5 = new QuestionRequest(
                     "What is a synonym for 'wise'?",
+                    Level.Easy,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Prudent", true),
@@ -182,6 +191,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ6 = new QuestionRequest(
                     "What does 'benevolent' mean?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Kind and generous", true),
@@ -195,6 +205,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ7 = new QuestionRequest(
                     "Choose the antonym for 'happiness'.",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Misery", true),
@@ -208,6 +219,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ8 = new QuestionRequest(
                     "What is a 'metaphor'?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("A figure of speech in which a word or phrase is applied to an object or action to which it is not literally applicable", true),
@@ -221,6 +233,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ9 = new QuestionRequest(
                     "What is a synonym for 'prolonged'?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Extended", true),
@@ -234,6 +247,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ10 = new QuestionRequest(
                     "What does 'ambivalent' mean?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Having mixed feelings or contradictory ideas about something or someone", true),
@@ -247,6 +261,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ11 = new QuestionRequest(
                     "Choose the antonym for 'begin'.",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("End", true),
@@ -260,6 +275,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ12 = new QuestionRequest(
                     "What is an 'allegory'?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("A story, poem, or picture that can be interpreted to reveal a hidden meaning, typically a moral or political one", true),
@@ -273,6 +289,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ13 = new QuestionRequest(
                     "What is a synonym for 'impatient'?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Restless", true),
@@ -286,6 +303,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ14 = new QuestionRequest(
                     "What does 'exemplify' mean?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("To be a typical example of", true),
@@ -299,6 +317,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ15 = new QuestionRequest(
                     "Choose the antonym for 'easy'.",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Difficult", true),
@@ -312,6 +331,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ16 = new QuestionRequest(
                     "What is 'irony'?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("The expression of one's meaning by using language that normally signifies the opposite, typically for humorous or emphatic effect", true),
@@ -325,6 +345,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ17 = new QuestionRequest(
                     "What is a synonym for 'complex'?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Intricate", true),
@@ -338,6 +359,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ18 = new QuestionRequest(
                     "What does 'resolute' mean?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Admirably purposeful, determined, and unwavering", true),
@@ -351,6 +373,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ19 = new QuestionRequest(
                     "Choose the antonym for 'truth'.",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Falsehood", true),
@@ -364,6 +387,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ20 = new QuestionRequest(
                     "What is 'personification'?",
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("The attribution of a personal nature or human characteristics to something non-human, or the representation of an abstract quality in human form", true),
@@ -379,6 +403,7 @@ public class SecurityApplication {
             // --- Generate 20 Grammar Questions ---
             QuestionRequest grammarQ1 = new QuestionRequest(
                     "Identify the noun in the sentence: \"The dog runs quickly.\"",
+                    Level.Medium,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Dog", true),
@@ -392,6 +417,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ2 = new QuestionRequest(
                     "Which sentence is grammatically correct?",
+                    Level.Medium,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("He went home.", true),
@@ -405,6 +431,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ3 = new QuestionRequest(
                     "What is the plural form of 'child'?",
+                    Level.Medium,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Children", true),
@@ -418,6 +445,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ4 = new QuestionRequest(
                     "Identify the verb in the sentence: \"The birds sing loudly.\"",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Sing", true),
@@ -431,6 +459,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ5 = new QuestionRequest(
                     "Which sentence contains a spelling error?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("I recieved a letter.", true), // Intentional error for the question
@@ -444,6 +473,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ6 = new QuestionRequest(
                     "What is the past tense of 'eat'?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Ate", true),
@@ -457,6 +487,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ7 = new QuestionRequest(
                     "Identify the adjective in the sentence: \"She has a red dress.\"",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Red", true),
@@ -470,6 +501,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ8 = new QuestionRequest(
                     "Which of the following is a coordinating conjunction?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("And", true),
@@ -483,6 +515,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ9 = new QuestionRequest(
                     "What is the correct punctuation for a question?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("?", true),
@@ -496,6 +529,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ10 = new QuestionRequest(
                     "Identify the preposition in the sentence: \"The cat is under the table.\"",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Under", true),
@@ -509,6 +543,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ11 = new QuestionRequest(
                     "Which sentence uses the present perfect tense correctly?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("I have finished my homework.", true),
@@ -522,6 +557,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ12 = new QuestionRequest(
                     "What is the comparative form of 'good'?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Better", true),
@@ -535,6 +571,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ13 = new QuestionRequest(
                     "Which word is a pronoun?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("She", true),
@@ -548,6 +585,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ14 = new QuestionRequest(
                     "What is the correct form of the verb 'to be' for 'they' in the present tense?",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Are", true),
@@ -561,6 +599,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ15 = new QuestionRequest(
                     "Choose the sentence with correct subject-verb agreement.",
+                    Level.Hard,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("The dogs bark loudly.", true),
@@ -574,6 +613,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ16 = new QuestionRequest(
                     "What is the superlative form of 'small'?",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Smallest", true),
@@ -587,6 +627,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ17 = new QuestionRequest(
                     "Identify the direct object in the sentence: \"She bought a new car.\"",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Car", true),
@@ -600,6 +641,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ18 = new QuestionRequest(
                     "Which of the following is an adverb of manner?",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Slowly", true),
@@ -613,6 +655,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ19 = new QuestionRequest(
                     "What type of sentence is this: \"What a beautiful day!\"",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Exclamatory", true),
@@ -626,6 +669,7 @@ public class SecurityApplication {
 
             QuestionRequest grammarQ20 = new QuestionRequest(
                     "Choose the correct spelling:",
+                    Level.Easy,
                     Category.Grammar,
                     List.of(
                             new AnswerRequest("Accommodate", true),

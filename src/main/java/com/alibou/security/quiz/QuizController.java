@@ -70,4 +70,11 @@ public class QuizController {
         QuizResponse updated = quizService.update(id, request);
         return ResponseEntity.ok(updated);
     }
+
+    @PostMapping("/generate")
+    public ResponseEntity<QuizResponse> generateQuiz(@RequestBody QuizGenerateRequest request) {
+
+        QuizResponse generatedQuiz = quizService.generateQuiz(request);
+        return ResponseEntity.ok(generatedQuiz);
+    }
 }
