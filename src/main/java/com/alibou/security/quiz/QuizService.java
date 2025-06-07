@@ -84,6 +84,8 @@ public class QuizService {
 
         quiz.setName(request.name());
 
+        quiz.setCategory(request.category());
+
         List<Question> updatedQuestions = questionRepository.findByIdIn(request.questionIds());
         quiz.setQuestions(updatedQuestions);
 
