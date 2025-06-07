@@ -196,9 +196,9 @@ public class QuizService {
     public QuizResponse generateQuiz(String name, Category category, Level level, Integer numberOfQuestions) {
         List<Question> questions;
         if(category != Category.Mixed){
-            questions = questionRepository.findRandomByCategory(category, numberOfQuestions);
+            questions = questionRepository.findRandomByCategoryAndLevel(category,  numberOfQuestions, level);
         }else{
-            questions = questionRepository.findRandom(numberOfQuestions);
+            questions = questionRepository.findRandom(numberOfQuestions, level);
         }
 
         Quiz quiz = Quiz.builder()
