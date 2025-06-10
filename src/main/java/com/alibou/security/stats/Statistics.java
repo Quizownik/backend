@@ -28,20 +28,40 @@ public class Statistics {
     private Integer completedAttempts;
 
     public Level addScore(Long score){
+        Level upcomingLevel;
+        Integer valueToCompare;
         if(score >= 0.75){
             this.highScoreAttempts++;
+            upcomingLevel = Level.Hard;
+            valueToCompare = this.highScoreAttempts;
+
         }else if(score >= 0.40){
             this.mediumScoreAttempts++;
+            upcomingLevel = Level.Medium;
+            valueToCompare = this.mediumScoreAttempts;
         }else{
             this.lowScoreAttempts++;
+            upcomingLevel = Level.Easy;
+            valueToCompare = this.lowScoreAttempts;
         }
         this.completedAttempts++;
 
+
+
         if(this.highScoreAttempts == max(highScoreAttempts, mediumScoreAttempts, lowScoreAttempts)){
+            if(this.highScoreAttempts.equals(valueToCompare)){
+                return upcomingLevel;
+            }
             return Level.Easy;
         }
         if(this.mediumScoreAttempts == max(highScoreAttempts, mediumScoreAttempts, lowScoreAttempts)){
+            if(this.mediumScoreAttempts.equals(valueToCompare)){
+                return upcomingLevel;
+            }
             return Level.Medium;
+        }
+        if(this.lowScoreAttempts.equals(valueToCompare)){
+            return upcomingLevel;
         }
         return Level.Hard;
     }

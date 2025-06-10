@@ -158,7 +158,7 @@ public class QuizService {
             if( userScore > 30 ){
                 level = Level.Hard;
             }
-            else if (userScore < 15){
+            else if (userScore > 15){
                 level = Level.Medium;
             }else{
                 level = Level.Easy;

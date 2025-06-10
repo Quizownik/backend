@@ -10,6 +10,7 @@ import com.alibou.security.stats.Statistics;
 import com.alibou.security.user.User;
 import com.alibou.security.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,7 +53,7 @@ public class ResultService {
         }
         userRepository.save(user);
 
-        Long score = (long)correctCount / chosen.size();
+        Long score = (long)correctCount / (long)chosen.size();
 
         // Sprawdź, czy użytkownik jest już masterem quizu
         if (!user.getMasteredQuizzes().contains(quiz)) {
@@ -104,14 +105,17 @@ public class ResultService {
 
        int factor = Level.toInt(currentLevel);
 
-
+        System.out.println("score procentowo:"+ score);
         if (score < 0.4) {
-            int temp = user.getScore() - correctCount *factor;
+            int temp =  (user.getScore() - (int)(factor*(1-score)*2));
             if(temp < 0){
                 temp = 0;
             }
+            System.out.println("zmniejszono o: "+ temp);
             user.setScore(temp);
+
         }else{
+            System.out.println("o tyle wzrosnie score bo >0.4 "+ correctCount * factor);
             user.setScore(user.getScore() + correctCount * factor); //*factor
         }
 
