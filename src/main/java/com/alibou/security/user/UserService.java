@@ -1,5 +1,6 @@
 package com.alibou.security.user;
 
+import com.alibou.security.quiz.Level;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
+
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
 
         var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -47,12 +49,22 @@ public class UserService {
 
     public UserStatsResponse getUserStats(Principal connectedUser) {
         User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        Integer userScore = user.getScore();
+        Level userLevel;
+        if (userScore > 30) {
+            userLevel = Level.Hard;
+        } else if (userScore > 15) {
+            userLevel = Level.Medium;
+        } else {
+            userLevel = Level.Easy;
+        }
         return new UserStatsResponse(
                 user.getFirstName(),
                 user.getLastName(),
                 user.getAppUsername(),
                 user.getEmail(),
                 user.getRole(),
+                userLevel,
                 user.getCreatedDate(),
                 user.getNumOfDoneQuizzes(),
                 user.getNumOfOnlyFullyCorrectQuizzes(),
