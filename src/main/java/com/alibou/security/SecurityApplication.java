@@ -7,10 +7,7 @@ import com.alibou.security.question.QuestionRepository;
 import com.alibou.security.question.QuestionRequest;
 import com.alibou.security.question.QuestionResponse;
 import com.alibou.security.question.QuestionService;
-import com.alibou.security.quiz.Category;
-import com.alibou.security.quiz.Level;
-import com.alibou.security.quiz.QuizRequest;
-import com.alibou.security.quiz.QuizService;
+import com.alibou.security.quiz.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -149,7 +146,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ3 = new QuestionRequest(
                     "Choose the antonym for 'hot'.",
-                    Level.Easy,
+                    Level.Medium,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Cold", true),
@@ -163,7 +160,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ4 = new QuestionRequest(
                     "What is a 'paradox'?",
-                    Level.Easy,
+                    Level.Hard,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("A seemingly self-contradictory statement that may nonetheless be true", true),
@@ -177,7 +174,7 @@ public class SecurityApplication {
 
             QuestionRequest vocabQ5 = new QuestionRequest(
                     "What is a synonym for 'wise'?",
-                    Level.Easy,
+                    Level.Hard,
                     Category.Vocabulary,
                     List.of(
                             new AnswerRequest("Prudent", true),
@@ -689,6 +686,7 @@ public class SecurityApplication {
 
             for (int i = 0; i < 19; i++) {
                 Category category;
+                Level level = Level.Mixed;
                 List<Integer> questionIds = new ArrayList<>();
 
                 if (i % 2 == 0) { // Even index for Grammar quizzes (10 quizzes: 0, 2, ..., 18)
@@ -706,12 +704,20 @@ public class SecurityApplication {
                         vocabularyQuestionIndex = (vocabularyQuestionIndex + 1) % allVocabularyQuestionIds.size();
                     }
                 }
-                QuizRequest quizRequest = new QuizRequest(
+                if(i % 5 == 0){
+                    level = Level.Easy;
+                }
+                if(i % 7 == 0){
+                    level = Level.Hard;
+                }
+                QuizRequest2 quizRequest = new QuizRequest2(
                         "Quiz " + i,
                         category,
-                        questionIds
+                        questionIds,
+                        level
+
                 );
-                quizService.createQuizWithQuestions(quizRequest);
+                quizService.createQuizWithQuestionsByAdmin(quizRequest);
             }
 
         };

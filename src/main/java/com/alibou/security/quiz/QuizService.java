@@ -37,8 +37,29 @@ public class QuizService {
 
 
     @Transactional
-    public String createQuizWithQuestions(QuizRequest request) {
+    public void createQuizWithQuestionsByAdmin(QuizRequest2 request) {
+        List<Question> questions;
+        if(request.category() != Category.Mixed){
+            questions = questionRepository.findByIdInAndCategory(request.questionIds(), request.category());
+        }else{
+            questions = questionRepository.findByIdIn(request.questionIds());
+        }
+        Quiz quiz = Quiz.builder()
+                .questions(questions)
+                .category(request.category())
+                .name(request.name())
+                .level(request.level())
+                .build();
 
+        for (Question q : questions) {
+            q.getQuizes().add(quiz);
+        }
+        quizRepository.save(quiz);
+
+    }
+
+    @Transactional
+    public String createQuizWithQuestions( QuizRequest request) {
         List<Question> questions;
         if(request.category() != Category.Mixed){
             questions = questionRepository.findByIdInAndCategory(request.questionIds(), request.category());

@@ -27,12 +27,12 @@ public class Statistics {
 
     private Integer completedAttempts;
 
-    public Level addScore(Long score){
+    public Level addScore(double score){
         Level upcomingLevel;
         Integer valueToCompare;
         if(score >= 0.75){
             this.highScoreAttempts++;
-            upcomingLevel = Level.Hard;
+            upcomingLevel = Level.Easy;
             valueToCompare = this.highScoreAttempts;
 
         }else if(score >= 0.40){
@@ -41,7 +41,7 @@ public class Statistics {
             valueToCompare = this.mediumScoreAttempts;
         }else{
             this.lowScoreAttempts++;
-            upcomingLevel = Level.Easy;
+            upcomingLevel = Level.Hard;
             valueToCompare = this.lowScoreAttempts;
         }
         this.completedAttempts++;

@@ -53,8 +53,8 @@ public class ResultService {
         }
         userRepository.save(user);
 
-        Long score = (long)correctCount / (long)chosen.size();
-
+        double score = ((double)correctCount / (double)chosen.size());
+        System.out.println("poprawne;" + correctCount + " / " + chosen.size()+" = "+score);
         // Sprawdź, czy użytkownik jest już masterem quizu
         if (!user.getMasteredQuizzes().contains(quiz)) {
             handleScoringMechanism(user, quiz, score, correctCount);
@@ -98,7 +98,7 @@ public class ResultService {
                 failCount
         );
     }
-    private void handleScoringMechanism(User user, Quiz quiz, Long score, Integer correctCount) {
+    private void handleScoringMechanism(User user, Quiz quiz, double score, Integer correctCount) {
         var statisticsOpt = statRepository.findByQuiz(quiz);
 
         Level currentLevel = quiz.getLevel();
