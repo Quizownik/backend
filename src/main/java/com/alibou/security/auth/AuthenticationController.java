@@ -30,6 +30,7 @@ public class AuthenticationController {
   )
   @ApiResponses({
           @ApiResponse(responseCode = "200", description = "Rejestracja zakończona sukcesem"),
+          @ApiResponse(responseCode = "406", description = "Username email jest już używany"),
           @ApiResponse(responseCode = "409", description = "Adres email jest już używany",
                   content = @Content(mediaType = "application/json"))
   })
