@@ -54,7 +54,7 @@ public class ResultService {
         userRepository.save(user);
 
         double score = ((double)correctCount / (double)chosen.size());
-        System.out.println("poprawne;" + correctCount + " / " + chosen.size()+" = "+score);
+
         // Sprawdź, czy użytkownik jest już masterem quizu
         if (!user.getMasteredQuizzes().contains(quiz)) {
             handleScoringMechanism(user, quiz, score, correctCount);
@@ -105,17 +105,15 @@ public class ResultService {
 
        int factor = Level.toInt(currentLevel);
 
-        System.out.println("score procentowo:"+ score);
         if (score < 0.4) {
             int temp =  (user.getScore() - (int)(factor*(1-score)*2));
             if(temp < 0){
                 temp = 0;
             }
-            System.out.println("zmniejszono o: "+ temp);
+
             user.setScore(temp);
 
         }else{
-            System.out.println("o tyle wzrosnie score bo >0.4 "+ correctCount * factor);
             user.setScore(user.getScore() + correctCount * factor); //*factor
         }
 
