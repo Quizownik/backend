@@ -26,6 +26,10 @@ public class AuthenticationController {
       return ResponseEntity
               .status(HttpStatus.CONFLICT)
               .body(Map.of("error", e.getMessage()));
+    } catch (UsernameAlreadyExistsException e) {
+      return ResponseEntity
+              .status(HttpStatus.NOT_ACCEPTABLE)
+              .body(Map.of("error", e.getMessage()));
     }
   }
   @PostMapping("/authenticate")

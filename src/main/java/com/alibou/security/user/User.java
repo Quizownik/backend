@@ -23,7 +23,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "_user",
-        uniqueConstraints = {@UniqueConstraint(name="student_email_unique", columnNames = "email")}
+        uniqueConstraints = {@UniqueConstraint(name="student_email_unique", columnNames = "email"),
+                @UniqueConstraint(name="username_unique", columnNames = "username")
+
+        }
+
 )
 public class User implements UserDetails {
 
