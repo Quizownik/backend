@@ -189,6 +189,10 @@ public class QuizService {
 
     public QuizResponse getQuiz(Integer id) {
         Quiz quiz = quizRepository.getReferenceById(id);
+        // Shuffle the answers for each question
+        quiz.getQuestions().forEach(question -> {
+            question.getAnswers().sort((a, b) -> Math.random() > 0.5 ? 1 : -1);
+        });
         return toResponse(quiz);
     }
 

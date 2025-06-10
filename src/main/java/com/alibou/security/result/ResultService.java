@@ -53,7 +53,11 @@ public class ResultService {
         userRepository.save(user);
 
         Long score = (long)correctCount / chosen.size();
-        handleScoringMechanism(user,quiz,score, correctCount);
+
+        // Sprawdź, czy użytkownik jest już masterem quizu
+        if (!user.getMasteredQuizzes().contains(quiz)) {
+            handleScoringMechanism(user, quiz, score, correctCount);
+        }
 
         Result result = new Result();
         result.setUser(user);
