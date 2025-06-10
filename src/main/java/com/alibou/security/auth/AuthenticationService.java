@@ -58,6 +58,9 @@ public class AuthenticationService {
     if (repository.existsByEmail(request.getEmail())) {
       throw new EmailAlreadyExistsException("Email already in use.");
     }
+    if(repository.existsByUsername(request.getUsername())){
+      throw new UsernameAlreadyExistsException("Username already in use.");
+    }
 
     var user = User.builder()
             .firstName(request.getFirstname())
