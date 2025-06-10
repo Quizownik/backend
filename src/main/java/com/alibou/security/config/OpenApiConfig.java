@@ -13,28 +13,23 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(
-                        name = "Alibou",
-                        email = "contact@aliboucoding.com",
-                        url = "https://aliboucoding.com/course"
+                        name = "Quizownik",
+                        email = "kontakt@quizedukacyjny.pl",
+                        url = "https://quizownik.pl"
                 ),
-                description = "OpenApi documentation for Spring Security",
-                title = "OpenApi specification - Alibou",
+                description = "Dokumentacja OpenAPI dla systemu quizów edukacyjnych. Zawiera endpointy do zarządzania quizami, pytaniami, użytkownikami oraz wynikami.",
+                title = "Quizownik - OpenAPI",
                 version = "1.0",
                 license = @License(
-                        name = "Licence name",
-                        url = "https://some-url.com"
-                ),
-                termsOfService = "Terms of service"
+                        name = "MIT License",
+                        url = "https://opensource.org/licenses/MIT"
+                )
         ),
         servers = {
                 @Server(
-                        description = "Local ENV",
+                        description = "Środowisko lokalne",
                         url = "http://localhost:8080"
                 ),
-                @Server(
-                        description = "PROD ENV",
-                        url = "https://aliboucoding.com/course"
-                )
         },
         security = {
                 @SecurityRequirement(
@@ -44,7 +39,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 )
 @SecurityScheme(
         name = "bearerAuth",
-        description = "JWT auth description",
+        description = "JWT - autoryzacja za pomocą tokena Bearer",
         scheme = "bearer",
         type = SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
