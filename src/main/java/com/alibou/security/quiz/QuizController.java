@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -51,18 +52,21 @@ public class QuizController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<String> createQuiz(@RequestBody QuizRequest request) {
         String resultString = quizService.createQuizWithQuestions(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(resultString);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteQuiz(@PathVariable Integer id) {
         quizService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<QuizResponse> updateQuiz(
             @PathVariable Integer id,
@@ -71,6 +75,7 @@ public class QuizController {
         return ResponseEntity.ok(updated);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/generate")
     public ResponseEntity<QuizResponse> generateQuiz(@RequestBody QuizGenerateRequest request) {
 
