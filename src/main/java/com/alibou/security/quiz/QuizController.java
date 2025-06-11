@@ -84,9 +84,11 @@ public class QuizController {
             @ApiResponse(responseCode = "404", description = "Quiz o podanym ID nie został znaleziony")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<QuizResponse> getQuiz(@PathVariable Integer id) {
+    public ResponseEntity<QuizResponse> getQuiz(
+            @PathVariable Integer id,
+            Principal connectedUser) {
 
-        QuizResponse result = quizService.getQuiz(id);
+        QuizResponse result = quizService.getQuiz(id, connectedUser);
         return ResponseEntity.ok(result);
     }
 
