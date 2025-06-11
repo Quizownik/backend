@@ -20,8 +20,11 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -165,36 +168,32 @@ public class ResultService {
         }
 
         for (Category category : categories) {
-            List<Result> results = resultRepository.getResultsByUserAndCategory(user, category);
+            Map<Integer, Long> solvedPerDayAgo = new HashMap<>();
 
+            List<Result> results = resultRepository.getResultsByUserAndCategory(user, category);
+            if(results.isEmpty()){
+                continue;
+            }
             double avgScore = results.stream()
                     .mapToDouble(Result::getScore)
                     .average()
                     .orElse(0.0);
 
-            long inLast7Days = 0;
-            long in7to14Days = 0;
-            long in14to21Days = 0;
-
             for (Result result : results) {
-                LocalDateTime finishedAt = result.getFinishedAt();
-                if (finishedAt == null) continue;
+               // solvedPerDayAgo = new HashMap<>();
+                LocalDateTime finished = result.getFinishedAt();
+                if (finished == null) continue;
 
-                if (!finishedAt.isBefore(now.minusDays(7))) {
-                    inLast7Days++;
-                } else if (!finishedAt.isBefore(now.minusDays(14))) {
-                    in7to14Days++;
-                } else if (!finishedAt.isBefore(now.minusDays(21))) {
-                    in14to21Days++;
+                long daysAgo = ChronoUnit.DAYS.between(finished.toLocalDate(), now.toLocalDate());
+                if (daysAgo >= 0 && daysAgo <= 200) {
+                    solvedPerDayAgo.put((int) daysAgo, solvedPerDayAgo.getOrDefault((int) daysAgo, 0L) + 1);
                 }
             }
 
             ResultPlotResponse summary = new ResultPlotResponse(
                     category.name(),
                     avgScore,
-                    inLast7Days,
-                    in7to14Days,
-                    in14to21Days
+                    solvedPerDayAgo
             );
 
             summaries.add(summary);
@@ -203,12 +202,15 @@ public class ResultService {
     }
 
     public List<QuizStatsResponse> getQuizStats() {
-        List<Quiz> quizzes = quizRepository.findAll(); // lub filtrowane po aktywności
+
+        List<Quiz> quizzes = quizRepository.findAll();
         LocalDateTime now = LocalDateTime.now();
 
         List<QuizStatsResponse> stats = new ArrayList<>();
 
         for (Quiz quiz : quizzes) {
+            Map<Integer, Long> solvedPerDayAgo = new HashMap<>();
+
             List<Result> results = resultRepository.findByQuiz(quiz);
 
             List<Double> scores = results.stream()
@@ -219,32 +221,44 @@ public class ResultService {
             double median = calculateMedian(scores);
             long total = scores.size();
 
-            long last7 = 0, days7to14 = 0, days14to21 = 0;
-
+//            long last7 = 0, days7to14 = 0, days14to21 = 0;
+//
+//            for (Result result : results) {
+//                LocalDateTime finished = result.getFinishedAt();
+//                if (finished == null) continue;
+//
+//                if (!finished.isBefore(now.minusDays(7))) {
+//                    last7++;
+//                } else if (!finished.isBefore(now.minusDays(14))) {
+//                    days7to14++;
+//                } else if (!finished.isBefore(now.minusDays(21))) {
+//                    days14to21++;
+//                }
+//            }
             for (Result result : results) {
+
                 LocalDateTime finished = result.getFinishedAt();
                 if (finished == null) continue;
 
-                if (!finished.isBefore(now.minusDays(7))) {
-                    last7++;
-                } else if (!finished.isBefore(now.minusDays(14))) {
-                    days7to14++;
-                } else if (!finished.isBefore(now.minusDays(21))) {
-                    days14to21++;
+                long daysAgo = ChronoUnit.DAYS.between(finished.toLocalDate(), now.toLocalDate());
+                if (daysAgo >= 0 && daysAgo <= 200) {
+                    solvedPerDayAgo.put((int) daysAgo, solvedPerDayAgo.getOrDefault((int) daysAgo, 0L) + 1);
                 }
             }
 
             stats.add(new QuizStatsResponse(
                     quiz.getId(),
                     quiz.getName(),
+                    quiz.getCategory().name(),
+                    quiz.getLevel().name(),
                     median,
                     total,
-                    last7,
-                    days7to14,
-                    days14to21
+//                    last7,
+//                    days7to14,
+//                    days14to21,
+                    solvedPerDayAgo
             ));
         }
-
         return stats;
     }
 

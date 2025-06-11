@@ -72,12 +72,25 @@ public class ResultController {
         return ResponseEntity.ok(results);
     }
 
+    @Operation(
+            summary = "Pobieranie wyników z 3 kategoprii dla danego użytkownika",
+            description = "Endpoint pozwalający na pobranie srednej ze score, kategorii ktorej dotyczy wpis i czestotliwosci podejsc"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę kategorii z czestotliwoscia podejsc i srednia")
+    })
     @GetMapping("/showPlots")
     public ResponseEntity<List<ResultPlotResponse>> getPlots(Principal connectedUser, Category category) {
         List<ResultPlotResponse> result= resultService.getUserPlots(connectedUser, category);
         return ResponseEntity.ok(result);
     }
-
+    @Operation(
+            summary = "Pobieranie dla admina info o czestotliwosci podejsc do kazdego quizu",
+            description = "Endpoint pozwalający na pobranie srednej ze score, kategorii ktorej dotyczy wpis i czestotliwosci podejsc"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę kategorii z czestotliwoscia podejsc i srednia")
+    })
     @GetMapping("/showPlotsForAdmin")
     public ResponseEntity<List<QuizStatsResponse>> getPlotsForAdmin() {
         List<QuizStatsResponse> result= resultService.getQuizStats();
