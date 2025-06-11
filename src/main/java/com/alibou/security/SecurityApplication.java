@@ -720,6 +720,31 @@ public class SecurityApplication {
                 quizService.createQuizWithQuestionsByAdmin(quizRequest);
             }
 
+            // --- Create BIG ONE quiz with 30 questions ---
+            String bigQuizName = "BIG ONE";
+            List<Integer> bigQuizQuestionIds = new ArrayList<>();
+
+            // Add 15 grammar questions to the big quiz
+            for (int i = 0; i < Math.min(15, allGrammarQuestionIds.size()); i++) {
+                bigQuizQuestionIds.add(allGrammarQuestionIds.get(i));
+            }
+
+            // Add 15 vocabulary questions to the big quiz
+            for (int i = 0; i < Math.min(15, allVocabularyQuestionIds.size()); i++) {
+                bigQuizQuestionIds.add(allVocabularyQuestionIds.get(i));
+            }
+
+            // Create the BIG ONE quiz
+            QuizRequest2 bigQuizRequest = new QuizRequest2(
+                    bigQuizName,
+                    Category.Mixed, // Mixed category since we have both Grammar and Vocabulary questions
+                    bigQuizQuestionIds,
+                    Level.Mixed  // Mixed level for variety
+            );
+            quizService.createQuizWithQuestionsByAdmin(bigQuizRequest);
+
+            System.out.println("Created BIG ONE quiz with " + bigQuizQuestionIds.size() + " questions!");
+
         };
     }
 }

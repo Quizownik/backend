@@ -9,13 +9,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ResultRepository  extends JpaRepository<Result, Integer> {
+
+public interface ResultRepository extends JpaRepository<Result, Integer> {
+
     Page<Result> findAllByUserId(Integer userId, Pageable pageable);
 
+    List<Result> findByUserAndQuiz(User user, Quiz quiz);
 
     void deleteAllByQuiz(Quiz quiz);
 
     List<Result> getResultsByUserAndCategory(User user, Category category);
 
     List<Result> findByQuiz(Quiz quiz);
+
 }

@@ -1,9 +1,11 @@
 package com.alibou.security.quiz;
 
+import com.alibou.security.answer.Answer;
 import com.alibou.security.answer.AnswerResponse;
 import com.alibou.security.question.Question;
 import com.alibou.security.question.QuestionRepository;
 import com.alibou.security.question.QuestionResponse;
+import com.alibou.security.result.Result;
 import com.alibou.security.result.ResultRepository;
 import com.alibou.security.stats.StatRepository;
 import com.alibou.security.user.User;
@@ -15,9 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.util.List;
-
-
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class QuizService {
     }
 
     @Transactional
-    public String createQuizWithQuestions( QuizRequest request) {
+    public String createQuizWithQuestions(QuizRequest request) {
         List<Question> questions;
         if(request.category() != Category.Mixed){
             questions = questionRepository.findByIdInAndCategory(request.questionIds(), request.category());
@@ -169,7 +170,7 @@ public class QuizService {
         return page.map(quiz -> toLabelResponse(quiz, user));
     }
 
-    public Page<QuizLabelResponse> getLabelQuizzes2(Category category,Level level, Pageable pageable, Principal connectedUser) {
+    public Page<QuizLabelResponse> getLabelQuizzes2(Category category, Level level, Pageable pageable, Principal connectedUser) {
         Page<Quiz> page;
 
         User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -184,15 +185,12 @@ public class QuizService {
             }else{
                 level = Level.Easy;
             }
-
         }
-
-
 
         if (level != Level.Mixed) {
             if (category != Category.All) {
-                page = quizRepository.findAllByCategoryAndLevel(category,level, pageable);
-            }else{
+                page = quizRepository.findAllByCategoryAndLevel(category, level, pageable);
+            } else {
                 page = quizRepository.findAllByLevel(level, pageable);
             }
         } else {
@@ -203,20 +201,98 @@ public class QuizService {
             }
         }
 
-
-
         return page.map(quiz -> toLabelResponse(quiz, user));
     }
 
-    public QuizResponse getQuiz(Integer id) {
+    public QuizResponse getQuiz(Integer id, Principal connectedUser) {
         Quiz quiz = quizRepository.getReferenceById(id);
-        // Shuffle the answers for each question
-        quiz.getQuestions().forEach(question -> {
-            question.getAnswers().sort((a, b) -> Math.random() > 0.5 ? 1 : -1);
-        });
-        return toResponse(quiz);
-    }
+        User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
 
+        // Pobierz wszystkie pytania z quizu
+        List<Question> allQuestions = quiz.getQuestions();
+
+        // Upewnij się, że pytania są unikalne - użyj Set do eliminacji duplikatów
+        Set<Integer> uniqueQuestionIds = new HashSet<>();
+        List<Question> uniqueQuestions = allQuestions.stream()
+                .filter(q -> uniqueQuestionIds.add(q.getId())) // dodaje do set i zwraca true jeśli element był unikalny
+                .collect(Collectors.toList());
+
+        // Znajdź poprzednie wyniki użytkownika dla tego quizu
+        List<Result> userResults = resultRepository.findByUserAndQuiz(user, quiz);
+
+        // Utwórz mapę pytań, na które użytkownik odpowiedział poprawnie
+        Map<Integer, Boolean> answeredCorrectly = new HashMap<>();
+
+        // Przeanalizuj poprzednie wyniki użytkownika
+        for (Result result : userResults) {
+            List<Integer> questionIds = result.getQuestionOrder();
+            List<Integer> chosenAnswers = result.getChosenAnswers();
+
+            // Dla każdej odpowiedzi sprawdź, czy była poprawna
+            for (int i = 0; i < questionIds.size() && i < chosenAnswers.size(); i++) {
+                Integer questionId = questionIds.get(i);
+                Integer answerId = chosenAnswers.get(i);
+
+                // Sprawdź, czy wybrana odpowiedź była poprawna
+                boolean isCorrect = uniqueQuestions.stream()
+                        .filter(q -> q.getId().equals(questionId))
+                        .flatMap(q -> q.getAnswers().stream())
+                        .filter(a -> a.getId().equals(answerId))
+                        .anyMatch(Answer::isCorrect);
+
+                // Jeśli odpowiedź była poprawna, zapisz to w mapie
+                if (isCorrect) {
+                    answeredCorrectly.put(questionId, true);
+                } else {
+                    // Jeśli na to pytanie użytkownik odpowiedział błędnie, zaznacz to
+                    answeredCorrectly.putIfAbsent(questionId, false);
+                }
+            }
+        }
+
+        // Sortuj pytania - najpierw te bez odpowiedzi lub z błędną odpowiedzią
+        List<Question> sortedQuestions = new ArrayList<>(uniqueQuestions);
+        sortedQuestions.sort((q1, q2) -> {
+            boolean q1Correct = answeredCorrectly.getOrDefault(q1.getId(), false);
+            boolean q2Correct = answeredCorrectly.getOrDefault(q2.getId(), false);
+
+            if (answeredCorrectly.containsKey(q1.getId()) && !answeredCorrectly.containsKey(q2.getId())) {
+                // q1 ma odpowiedź, q2 nie ma - q2 ma wyższy priorytet
+                return 1;
+            } else if (!answeredCorrectly.containsKey(q1.getId()) && answeredCorrectly.containsKey(q2.getId())) {
+                // q1 nie ma odpowiedzi, q2 ma - q1 ma wyższy priorytet
+                return -1;
+            } else if (q1Correct && !q2Correct) {
+                // q1 ma poprawną odpowiedź, q2 ma błędną - q2 ma wyższy priorytet
+                return 1;
+            } else if (!q1Correct && q2Correct) {
+                // q1 ma błędną odpowiedź, q2 ma poprawną - q1 ma wyższy priorytet
+                return -1;
+            }
+
+            // Jeśli oba pytania mają taki sam status, mieszaj losowo
+            return Math.random() > 0.5 ? 1 : -1;
+        });
+
+        // Ogranicz liczbę pytań do maksymalnie 10
+        List<Question> limitedQuestions = sortedQuestions.stream()
+                .limit(10)
+                .collect(Collectors.toList());
+
+        // Dla każdego pytania mieszaj kolejność odpowiedzi
+        limitedQuestions.forEach(question -> question.getAnswers().sort((a, b) -> Math.random() > 0.5 ? 1 : -1));
+
+        // Utwórz tymczasowy obiekt Quiz z ograniczoną liczbą pytań
+        Quiz limitedQuiz = Quiz.builder()
+                .id(quiz.getId())
+                .name(quiz.getName())
+                .category(quiz.getCategory())
+                .level(quiz.getLevel())
+                .questions(limitedQuestions)
+                .build();
+
+        return toResponse(limitedQuiz);
+    }
 
     public QuizResponse generateQuiz(QuizGenerateRequest request) {
 
@@ -256,4 +332,3 @@ public class QuizService {
         return toResponse(quiz);
     }
 }
-
