@@ -211,6 +211,12 @@ public class QuizService {
         // Pobierz wszystkie pytania z quizu
         List<Question> allQuestions = quiz.getQuestions();
 
+        // Upewnij się, że pytania są unikalne - użyj Set do eliminacji duplikatów
+        Set<Integer> uniqueQuestionIds = new HashSet<>();
+        List<Question> uniqueQuestions = allQuestions.stream()
+                .filter(q -> uniqueQuestionIds.add(q.getId())) // dodaje do set i zwraca true jeśli element był unikalny
+                .collect(Collectors.toList());
+
         // Znajdź poprzednie wyniki użytkownika dla tego quizu
         List<Result> userResults = resultRepository.findByUserAndQuiz(user, quiz);
 
@@ -228,7 +234,7 @@ public class QuizService {
                 Integer answerId = chosenAnswers.get(i);
 
                 // Sprawdź, czy wybrana odpowiedź była poprawna
-                boolean isCorrect = allQuestions.stream()
+                boolean isCorrect = uniqueQuestions.stream()
                         .filter(q -> q.getId().equals(questionId))
                         .flatMap(q -> q.getAnswers().stream())
                         .filter(a -> a.getId().equals(answerId))
@@ -245,7 +251,7 @@ public class QuizService {
         }
 
         // Sortuj pytania - najpierw te bez odpowiedzi lub z błędną odpowiedzią
-        List<Question> sortedQuestions = new ArrayList<>(allQuestions);
+        List<Question> sortedQuestions = new ArrayList<>(uniqueQuestions);
         sortedQuestions.sort((q1, q2) -> {
             boolean q1Correct = answeredCorrectly.getOrDefault(q1.getId(), false);
             boolean q2Correct = answeredCorrectly.getOrDefault(q2.getId(), false);
