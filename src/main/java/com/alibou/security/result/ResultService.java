@@ -22,6 +22,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -200,6 +201,65 @@ public class ResultService {
         }
         return summaries;
     }
+
+    public List<QuizStatsResponse> getQuizStats() {
+        List<Quiz> quizzes = quizRepository.findAll(); // lub filtrowane po aktywności
+        LocalDateTime now = LocalDateTime.now();
+
+        List<QuizStatsResponse> stats = new ArrayList<>();
+
+        for (Quiz quiz : quizzes) {
+            List<Result> results = resultRepository.findByQuiz(quiz);
+
+            List<Double> scores = results.stream()
+                    .map(Result::getScore)
+                    .sorted()
+                    .collect(Collectors.toList());
+
+            double median = calculateMedian(scores);
+            long total = scores.size();
+
+            long last7 = 0, days7to14 = 0, days14to21 = 0;
+
+            for (Result result : results) {
+                LocalDateTime finished = result.getFinishedAt();
+                if (finished == null) continue;
+
+                if (!finished.isBefore(now.minusDays(7))) {
+                    last7++;
+                } else if (!finished.isBefore(now.minusDays(14))) {
+                    days7to14++;
+                } else if (!finished.isBefore(now.minusDays(21))) {
+                    days14to21++;
+                }
+            }
+
+            stats.add(new QuizStatsResponse(
+                    quiz.getId(),
+                    quiz.getName(),
+                    median,
+                    total,
+                    last7,
+                    days7to14,
+                    days14to21
+            ));
+        }
+
+        return stats;
+    }
+
+    private double calculateMedian(List<Double> sortedScores) {
+        int size = sortedScores.size();
+        if (size == 0) return 0.0;
+
+        if (size % 2 == 1) {
+            return sortedScores.get(size / 2);
+        } else {
+            return (sortedScores.get(size / 2 - 1) + sortedScores.get(size / 2)) / 2.0;
+        }
+    }
+
+
 
 }
 

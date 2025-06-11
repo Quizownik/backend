@@ -77,5 +77,11 @@ public class ResultController {
         List<ResultPlotResponse> result= resultService.getUserPlots(connectedUser, category);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/showPlotsForAdmin")
+    public ResponseEntity<List<QuizStatsResponse>> getPlotsForAdmin() {
+        List<QuizStatsResponse> result= resultService.getQuizStats();
+        return ResponseEntity.ok(result);
+    }
 }
 

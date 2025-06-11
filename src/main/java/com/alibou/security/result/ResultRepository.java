@@ -16,4 +16,6 @@ public interface ResultRepository  extends JpaRepository<Result, Integer> {
     void deleteAllByQuiz(Quiz quiz);
 
     List<Result> getResultsByUserAndCategory(User user, Category category);
+
+    List<Result> findByQuiz(Quiz quiz);
 }
