@@ -4,20 +4,28 @@ import com.alibou.security.answer.Answer;
 import com.alibou.security.answer.AnswerRepository;
 import com.alibou.security.quiz.Level;
 import com.alibou.security.quiz.Quiz;
+import com.alibou.security.quiz.Category;
 import com.alibou.security.quiz.QuizRepository;
 import com.alibou.security.stats.StatRepository;
 import com.alibou.security.stats.Statistics;
 import com.alibou.security.user.User;
 import com.alibou.security.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,6 +75,8 @@ public class ResultService {
         result.setDuration(request.duration());
         result.setQuestionOrder(request.questionOrder());
         result.setChosenAnswers(request.chosenAnswers());
+        result.setScore(score);
+        result.setCategory(quiz.getCategory());
 
         return resultRepository.save(result);
     }
@@ -141,6 +151,129 @@ public class ResultService {
         return resultRepository.findAllByUserId(user.getId(), pageable)
                 .map(this::toResponse);
     }
+
+    public List<ResultPlotResponse> getUserPlots(Principal connectedUser, Category c) {
+
+        var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        LocalDateTime now = LocalDateTime.now();
+        List<ResultPlotResponse> summaries = new ArrayList<>();
+        List<Category> categories = new ArrayList<>();
+
+        if(c == Category.All){
+            categories.add(Category.Grammar);
+            categories.add(Category.Vocabulary);
+            categories.add(Category.Mixed);
+        }else  {
+            categories.add(c);
+        }
+
+        for (Category category : categories) {
+            Map<Integer, Long> solvedPerDayAgo = new HashMap<>();
+
+            List<Result> results = resultRepository.getResultsByUserAndCategory(user, category);
+            if(results.isEmpty()){
+                continue;
+            }
+            double avgScore = results.stream()
+                    .mapToDouble(Result::getScore)
+                    .average()
+                    .orElse(0.0);
+
+            for (Result result : results) {
+               // solvedPerDayAgo = new HashMap<>();
+                LocalDateTime finished = result.getFinishedAt();
+                if (finished == null) continue;
+
+                long daysAgo = ChronoUnit.DAYS.between(finished.toLocalDate(), now.toLocalDate());
+                if (daysAgo >= 0 && daysAgo <= 200) {
+                    solvedPerDayAgo.put((int) daysAgo, solvedPerDayAgo.getOrDefault((int) daysAgo, 0L) + 1);
+                }
+            }
+
+            ResultPlotResponse summary = new ResultPlotResponse(
+                    category.name(),
+                    avgScore,
+                    solvedPerDayAgo
+            );
+
+            summaries.add(summary);
+        }
+        return summaries;
+    }
+
+    public List<QuizStatsResponse> getQuizStats() {
+
+        List<Quiz> quizzes = quizRepository.findAll();
+        LocalDateTime now = LocalDateTime.now();
+
+        List<QuizStatsResponse> stats = new ArrayList<>();
+
+        for (Quiz quiz : quizzes) {
+            Map<Integer, Long> solvedPerDayAgo = new HashMap<>();
+
+            List<Result> results = resultRepository.findByQuiz(quiz);
+
+            List<Double> scores = results.stream()
+                    .map(Result::getScore)
+                    .sorted()
+                    .collect(Collectors.toList());
+
+            double median = calculateMedian(scores);
+            long total = scores.size();
+
+//            long last7 = 0, days7to14 = 0, days14to21 = 0;
+//
+//            for (Result result : results) {
+//                LocalDateTime finished = result.getFinishedAt();
+//                if (finished == null) continue;
+//
+//                if (!finished.isBefore(now.minusDays(7))) {
+//                    last7++;
+//                } else if (!finished.isBefore(now.minusDays(14))) {
+//                    days7to14++;
+//                } else if (!finished.isBefore(now.minusDays(21))) {
+//                    days14to21++;
+//                }
+//            }
+            for (Result result : results) {
+
+                LocalDateTime finished = result.getFinishedAt();
+                if (finished == null) continue;
+
+                long daysAgo = ChronoUnit.DAYS.between(finished.toLocalDate(), now.toLocalDate());
+                if (daysAgo >= 0 && daysAgo <= 200) {
+                    solvedPerDayAgo.put((int) daysAgo, solvedPerDayAgo.getOrDefault((int) daysAgo, 0L) + 1);
+                }
+            }
+
+            stats.add(new QuizStatsResponse(
+                    quiz.getId(),
+                    quiz.getName(),
+                    quiz.getCategory().name(),
+                    quiz.getLevel().name(),
+                    median,
+                    total,
+//                    last7,
+//                    days7to14,
+//                    days14to21,
+                    solvedPerDayAgo
+            ));
+        }
+        return stats;
+    }
+
+    private double calculateMedian(List<Double> sortedScores) {
+        int size = sortedScores.size();
+        if (size == 0) return 0.0;
+
+        if (size % 2 == 1) {
+            return sortedScores.get(size / 2);
+        } else {
+            return (sortedScores.get(size / 2 - 1) + sortedScores.get(size / 2)) / 2.0;
+        }
+    }
+
+
 
 }
 

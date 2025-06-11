@@ -1,5 +1,6 @@
 package com.alibou.security.result;
 
+import com.alibou.security.quiz.Category;
 import com.alibou.security.quiz.Quiz;
 import com.alibou.security.user.User;
 import jakarta.persistence.*;
@@ -38,6 +39,9 @@ public class Result {
 
     private Long duration; //w sekundach
 
+    private double score;
+
+    private Category category;
 
     @ElementCollection
     @CollectionTable(name = "result_question_order", joinColumns = @JoinColumn(name = "result_id"))

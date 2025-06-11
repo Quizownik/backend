@@ -1,5 +1,6 @@
 package com.alibou.security.result;
 
+import com.alibou.security.quiz.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.Parameter;
+
+import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/results")
@@ -66,6 +70,31 @@ public class ResultController {
             @PageableDefault(size = 10, sort = "finishedAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ResultResponse> results = resultService.getResultsForCurrentUser(pageable);
         return ResponseEntity.ok(results);
+    }
+
+    @Operation(
+            summary = "Pobieranie wyników z 3 kategoprii dla danego użytkownika",
+            description = "Endpoint pozwalający na pobranie srednej ze score, kategorii ktorej dotyczy wpis i czestotliwosci podejsc"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę kategorii z czestotliwoscia podejsc i srednia")
+    })
+    @GetMapping("/showPlots")
+    public ResponseEntity<List<ResultPlotResponse>> getPlots(Principal connectedUser, Category category) {
+        List<ResultPlotResponse> result= resultService.getUserPlots(connectedUser, category);
+        return ResponseEntity.ok(result);
+    }
+    @Operation(
+            summary = "Pobieranie dla admina info o czestotliwosci podejsc do kazdego quizu",
+            description = "Endpoint pozwalający na pobranie srednej ze score, kategorii ktorej dotyczy wpis i czestotliwosci podejsc"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Zwrócono listę kategorii z czestotliwoscia podejsc i srednia")
+    })
+    @GetMapping("/showPlotsForAdmin")
+    public ResponseEntity<List<QuizStatsResponse>> getPlotsForAdmin() {
+        List<QuizStatsResponse> result= resultService.getQuizStats();
+        return ResponseEntity.ok(result);
     }
 }
 
