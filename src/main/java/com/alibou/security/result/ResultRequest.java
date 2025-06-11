@@ -14,11 +14,5 @@ public record ResultRequest(
         Long duration,
         List<Integer> questionOrder,
         List<Integer> chosenAnswers
-//        QuizRequest quiz,
-//        LocalDateTime finishedAt,
-//        Duration duration,
-//        Integer userId,
-//        List<Integer> questionIdOrder,
-//        List <Integer> chosenAnswerId
         ) {
 }

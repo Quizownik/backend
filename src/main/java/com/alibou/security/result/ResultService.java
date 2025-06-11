@@ -4,19 +4,23 @@ import com.alibou.security.answer.Answer;
 import com.alibou.security.answer.AnswerRepository;
 import com.alibou.security.quiz.Level;
 import com.alibou.security.quiz.Quiz;
+import com.alibou.security.quiz.Category;
 import com.alibou.security.quiz.QuizRepository;
 import com.alibou.security.stats.StatRepository;
 import com.alibou.security.stats.Statistics;
 import com.alibou.security.user.User;
 import com.alibou.security.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -67,6 +71,8 @@ public class ResultService {
         result.setDuration(request.duration());
         result.setQuestionOrder(request.questionOrder());
         result.setChosenAnswers(request.chosenAnswers());
+        result.setScore(score);
+        result.setCategory(quiz.getCategory());
 
         return resultRepository.save(result);
     }
@@ -140,6 +146,59 @@ public class ResultService {
 
         return resultRepository.findAllByUserId(user.getId(), pageable)
                 .map(this::toResponse);
+    }
+
+    public List<ResultPlotResponse> getUserPlots(Principal connectedUser, Category c) {
+
+        var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        LocalDateTime now = LocalDateTime.now();
+        List<ResultPlotResponse> summaries = new ArrayList<>();
+        List<Category> categories = new ArrayList<>();
+
+        if(c == Category.All){
+            categories.add(Category.Grammar);
+            categories.add(Category.Vocabulary);
+            categories.add(Category.Mixed);
+        }else  {
+            categories.add(c);
+        }
+
+        for (Category category : categories) {
+            List<Result> results = resultRepository.getResultsByUserAndCategory(user, category);
+
+            double avgScore = results.stream()
+                    .mapToDouble(Result::getScore)
+                    .average()
+                    .orElse(0.0);
+
+            long inLast7Days = 0;
+            long in7to14Days = 0;
+            long in14to21Days = 0;
+
+            for (Result result : results) {
+                LocalDateTime finishedAt = result.getFinishedAt();
+                if (finishedAt == null) continue;
+
+                if (!finishedAt.isBefore(now.minusDays(7))) {
+                    inLast7Days++;
+                } else if (!finishedAt.isBefore(now.minusDays(14))) {
+                    in7to14Days++;
+                } else if (!finishedAt.isBefore(now.minusDays(21))) {
+                    in14to21Days++;
+                }
+            }
+
+            ResultPlotResponse summary = new ResultPlotResponse(
+                    category.name(),
+                    avgScore,
+                    inLast7Days,
+                    in7to14Days,
+                    in14to21Days
+            );
+
+            summaries.add(summary);
+        }
+        return summaries;
     }
 
 }
