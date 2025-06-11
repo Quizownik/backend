@@ -280,9 +280,7 @@ public class QuizService {
                 .collect(Collectors.toList());
 
         // Dla każdego pytania mieszaj kolejność odpowiedzi
-        limitedQuestions.forEach(question -> {
-            question.getAnswers().sort((a, b) -> Math.random() > 0.5 ? 1 : -1);
-        });
+        limitedQuestions.forEach(question -> question.getAnswers().sort((a, b) -> Math.random() > 0.5 ? 1 : -1));
 
         // Utwórz tymczasowy obiekt Quiz z ograniczoną liczbą pytań
         Quiz limitedQuiz = Quiz.builder()
