@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -29,8 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
-
+@Transactional
 public class ResultService {
 
     private final ResultRepository resultRepository;
@@ -39,6 +39,7 @@ public class ResultService {
     private final AnswerRepository answerRepository;
     private final StatRepository statRepository;
 
+    @Transactional
     public Result save(ResultRequest request) {
         var user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -185,7 +186,7 @@ public class ResultService {
                 if (finished == null) continue;
 
                 long daysAgo = ChronoUnit.DAYS.between(finished.toLocalDate(), now.toLocalDate());
-                if (daysAgo >= 0 && daysAgo <= 200) {
+                if (daysAgo >= 0 && daysAgo <= 90) {
                     solvedPerDayAgo.put((int) daysAgo, solvedPerDayAgo.getOrDefault((int) daysAgo, 0L) + 1);
                 }
             }
@@ -241,7 +242,7 @@ public class ResultService {
                 if (finished == null) continue;
 
                 long daysAgo = ChronoUnit.DAYS.between(finished.toLocalDate(), now.toLocalDate());
-                if (daysAgo >= 0 && daysAgo <= 200) {
+                if (daysAgo >= 0 && daysAgo <= 90) {
                     solvedPerDayAgo.put((int) daysAgo, solvedPerDayAgo.getOrDefault((int) daysAgo, 0L) + 1);
                 }
             }

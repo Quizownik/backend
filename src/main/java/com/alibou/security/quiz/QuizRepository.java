@@ -12,4 +12,8 @@ public interface QuizRepository extends JpaRepository<Quiz, Integer> {
     Page<Quiz> findAllByCategoryAndLevel(Category category, Level level, Pageable pageable);
 
     Page<Quiz> findAllByLevel(Level level, Pageable pageable);
+
+    Quiz findByNameContainingIgnoreCase(String quizName);
+
+    Optional<Quiz> findByName(String quizName);
 }

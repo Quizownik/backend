@@ -1,5 +1,6 @@
 package com.alibou.security;
 
+import com.alibou.security.answer.Answer;
 import com.alibou.security.answer.AnswerRequest;
 import com.alibou.security.auth.AuthenticationService;
 import com.alibou.security.auth.RegisterRequest;
@@ -8,15 +9,22 @@ import com.alibou.security.question.QuestionRequest;
 import com.alibou.security.question.QuestionResponse;
 import com.alibou.security.question.QuestionService;
 import com.alibou.security.quiz.*;
+import com.alibou.security.result.ResultRequest;
+import com.alibou.security.result.ResultService;
+import com.alibou.security.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import static com.alibou.security.user.Role.*;
 
@@ -29,10 +37,14 @@ public class SecurityApplication {
     }
 
     @Bean
+    @Transactional
     public CommandLineRunner commandLineRunner(
             AuthenticationService service,
             QuestionService questionService,
-            QuizService quizService) {
+            QuizService quizService,
+            QuizRepository quizRepository,
+            UserRepository userRepository,
+            ResultService resultService) {
         return args -> {
 
             var admin = RegisterRequest.builder()
@@ -43,7 +55,11 @@ public class SecurityApplication {
                     .password("password123!")
                     .role(ADMIN)
                     .build();
+            // Rejestracja i zapis użytkownika z rolą ADMIN
             System.out.println("Admin token: " + service.register(admin).getAccessToken());
+            // Pobieramy zapisanego użytkownika z bazy danych
+            var savedAdmin = userRepository.findByEmail("admin@mail.com")
+                    .orElseThrow(() -> new RuntimeException("Nie udało się zapisać administratora"));
 
             var manager = RegisterRequest.builder()
                     .firstname("Menadżer")
@@ -53,7 +69,11 @@ public class SecurityApplication {
                     .password("password123!")
                     .role(MANAGER)
                     .build();
-            System.out.println("Manager token: " + service.register(manager).getAccessToken());
+            // Rejestracja i zapis użytkownika z rolą MANAGER
+            service.register(manager);
+            // Pobieramy zapisanego użytkownika z bazy danych
+            var savedManager = userRepository.findByEmail("manager@mail.com")
+                    .orElseThrow(() -> new RuntimeException("Nie udało się zapisać managera"));
 
             var user = RegisterRequest.builder()
                     .firstname("Krystian")
@@ -63,7 +83,14 @@ public class SecurityApplication {
                     .password("qwerty123!")
                     .role(USER)
                     .build();
-            System.out.println("User token: " + service.register(user).getAccessToken());
+            // Rejestracja i zapis użytkownika z rolą USER
+            service.register(user);
+            // Pobieramy zapisanego użytkownika z bazy danych
+            var savedUser = userRepository.findByEmail("juszczyk-krystian@wp.pl")
+                    .orElseThrow(() -> new RuntimeException("Nie udało się zapisać użytkownika"));
+
+            System.out.println("Zapisano użytkowników: Admin (ID: " + savedAdmin.getId() + "), Manager (ID: " + savedManager.getId() +
+                    "), User (ID: " + savedUser.getId() + ")");
 
             // Lists to hold all question IDs for each category
             List<Integer> allGrammarQuestionIds = new ArrayList<>();
@@ -745,6 +772,57 @@ public class SecurityApplication {
 
             System.out.println("Created BIG ONE quiz with " + bigQuizQuestionIds.size() + " questions!");
 
+            // Pobieramy użytkownika z bazy danych na podstawie adresu email
+            var actualUser = userRepository.findById(savedUser.getId())
+                    .orElseThrow(() -> new RuntimeException("Nie można znaleźć użytkownika juszczyk-krystian@wp.pl"));
+
+            System.out.println("AcutalUserID: " + actualUser.getId());
+            // Pobieramy quiz z jawnie załadowanymi pytaniami
+            var bigOneQuiz = quizService.findQuizWithQuestionsById(
+                    quizRepository.findByName("BIG ONE").orElseThrow().getId()
+            );
+
+            Random random = new Random();
+            int resultsCount = 90 + random.nextInt(100); // 30-60 wyników
+
+            for (int i = 0; i < resultsCount; i++) {
+                int daysAgo = random.nextInt(91); // 0-90 dni temu
+                LocalDateTime finishedAt = LocalDateTime.now().minusDays(daysAgo);
+                int duration = 60 + random.nextInt(600); // 1-10 minut
+
+                // Przygotowujemy kopię ID pytań żeby można było je pomieszać
+                List<Integer> questionOrder = new ArrayList<>();
+                for (var question : bigOneQuiz.getQuestions()) {
+                    questionOrder.add(question.getId());
+                }
+                Collections.shuffle(questionOrder);
+
+                // Losowe odpowiedzi (wszystkie poprawne lub mieszane)
+                List<Integer> chosenAnswers = new ArrayList<>();
+                for (var question : bigOneQuiz.getQuestions()) {
+                    var answers = question.getAnswers();
+                    var correct = answers.stream().filter(Answer::isCorrect).findFirst().orElse(answers.get(0));
+                    // 60% szans na poprawną odpowiedź
+                    if (random.nextDouble() < 0.6) {
+                        chosenAnswers.add(correct.getId());
+                    } else {
+                        chosenAnswers.add(answers.get(random.nextInt(answers.size())).getId());
+                    }
+                }
+
+                ResultRequest resultRequest = new ResultRequest(
+                        bigOneQuiz.getId().intValue(),
+                        actualUser.getId(),
+                        finishedAt,
+                        (long) duration,
+                        questionOrder,
+                        chosenAnswers
+                );
+                resultService.save(resultRequest);
+            }
+            System.out.println("Dodano " + resultsCount + " przykładowych wyników dla quizu BIG ONE.");
         };
     }
 }
+
+

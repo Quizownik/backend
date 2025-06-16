@@ -331,4 +331,22 @@ public class QuizService {
 
         return toResponse(quiz);
     }
+
+    public Quiz findByName(String quizName) {
+        return quizRepository.findByNameContainingIgnoreCase(quizName);
+    }
+
+    @Transactional(readOnly = true)
+    public Quiz findQuizWithQuestionsById(Long quizId) {
+        Quiz quiz = quizRepository.findById(Math.toIntExact(quizId)).orElseThrow(() ->
+                new NoSuchElementException("Quiz o ID " + quizId + " nie istnieje"));
+
+        // Jawne załadowanie kolekcji pytań (eager loading)
+        quiz.getQuestions().size();
+
+        // Jawne załadowanie odpowiedzi dla każdego pytania
+        quiz.getQuestions().forEach(question -> question.getAnswers().size());
+
+        return quiz;
+    }
 }
